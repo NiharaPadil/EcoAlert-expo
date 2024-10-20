@@ -4,12 +4,15 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 
-const Reg = () => {
-    const router = useRouter();
-    router.push('./RegisterPage'); // Navigate to the User Sign Up page
-  };
 
 const SplashScreen2 = () => {
+    const router = useRouter();
+
+    const Reg = () => {
+        router.push('/Authentication/RegisterPage'); // Navigate to the User Sign Up page
+      };
+
+      
     return (
         <View style={styles.slide}>
             <Image
@@ -59,7 +62,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 18,
-        color: '#000',
+        color: 'green',
     },
     dotContainer: {
         flexDirection: 'row',
@@ -77,4 +80,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SplashScreen2;
+export default SplashScreen2;

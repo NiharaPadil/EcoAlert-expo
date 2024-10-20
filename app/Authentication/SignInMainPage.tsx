@@ -9,7 +9,7 @@ const SignInMainPage = () => {
   const router = useRouter(); // Using expo-router for navigation
 
   const RegisterPage = () => {
-    router.push('./RegisterPage'); // Navigate to RegisterPage
+    router.push('/Authentication/RegisterPage'); // Navigate to RegisterPage
   };
 
   return (

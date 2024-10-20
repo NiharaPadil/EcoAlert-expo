@@ -3,12 +3,15 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-const Splash2 = () => {
-    const router = useRouter();
-    router.push('./Splash2'); // Navigate to the User Sign Up page
-  };
 
 const SplashScreen1 = () => {
+    const router = useRouter();
+    const Splash2 = () => {
+        
+        router.push('/Authentication/Splash2'); // Navigate to the User Sign Up page
+      };
+
+      
     return (
         <View style={styles.slide}>
             <Image
@@ -78,4 +81,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SplashScreen1;
+export default SplashScreen1;

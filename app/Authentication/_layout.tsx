@@ -13,7 +13,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -29,13 +29,12 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="Authentication" options={{ headerShown: false }} />
-       
-        {/* <Stack.Screen name="User" options={{ headerShown: false }} /> */}
-        {/* <Stack.Screen name="Authority" options={{ headerShown: false }} /> */}
-
-      </Stack>
+      <Stack.Screen name="Splash1" options={{ headerShown: false }} />
+      <Stack.Screen name="Splash2" options={{ headerShown: false }} />
+      <Stack.Screen name="AuthoritiesSignUp" options={{ headerShown: false }} />
+      <Stack.Screen name="RegisterPage" options={{ headerShown: false }} />
+      <Stack.Screen name="SignInMainPage" options={{ headerShown: false }} />
+   </Stack>
     </ThemeProvider>
   );
 }
