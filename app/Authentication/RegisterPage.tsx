@@ -8,15 +8,15 @@ const RegisterPage = () => {
   const router = useRouter(); // Create a router instance
 
   const user = () => {
-    router.push('./UserSignUp'); // Navigate to the User Sign Up page
+    router.push('/Authentication/UserSignUp'); // Navigate to the User Sign Up page
   };
   
   const authorities = () => {
-    router.push('./AuthoritiesSignUp'); // Navigate to the Authorities Sign Up page
+    router.push('/Authentication/AuthoritiesSignUp'); // Navigate to the Authorities Sign Up page
   };
 
   const SignInMainPage = () => {
-    router.push('./SignInMainPage'); // Navigate to the Sign In Main page
+    router.push('/Authentication/SignInMainPage'); // Navigate to the Sign In Main page
   };
 
   return (
