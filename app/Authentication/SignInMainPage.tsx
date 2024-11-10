@@ -1,15 +1,75 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
+import React , {useState} from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions ,Alert} from 'react-native';
 import { Button } from 'react-native-elements';
 import { useRouter } from 'expo-router';
-
+import { auth, db } from '../../constants/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width, height } = Dimensions.get('window');
 
 const SignInMainPage = () => {
   const router = useRouter(); // Using expo-router for navigation
+  const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
   const RegisterPage = () => {
     router.push('/Authentication/RegisterPage'); // Navigate to RegisterPage
+  };
+
+  const handleLogin = async () => {
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      
+      const user = userCred.user;
+
+      console.log(user)
+      // Retrieve user data from Firestore using uid
+      const userDoc = await getDoc(doc(db, 'UserData', user.uid));
+      const AuthDoc = await getDoc(doc(db, 'AuthorityData', user.uid));
+      
+      // if (userDoc.exists())
+      //   console.log("exists");
+      // else console.log("not exists");
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData && userData.Role) {
+          await AsyncStorage.setItem('isLoggedIn', 'true');
+          await AsyncStorage.setItem('UserRole', userData.Role);
+          await AsyncStorage.setItem('UserId', user.uid);
+          navigateToRoleBasedScreen(userData.Role);
+        } else {
+          setError('User role not found.');
+        }
+      } 
+      else if(AuthDoc.exists())
+        {
+          const Authdata = AuthDoc.data();
+          if (Authdata && Authdata.Role) {
+            await AsyncStorage.setItem('isLoggedIn', 'true');
+            await AsyncStorage.setItem('UserRole', Authdata.Role);
+            await AsyncStorage.setItem('UserId', user.uid);
+            navigateToRoleBasedScreen(Authdata.Role);
+        }
+        else{
+          setError('User role not found.');
+        }
+      }else {
+        setError('User data not found in Firestore.');
+      }
+    } catch (err) {
+      Alert.alert('Uh-oh!', 'Invalid email or password.\n\nPlease try again.');
+    }
+  };
+
+  const navigateToRoleBasedScreen = (Role: string) => {
+    if (Role === 'Authority') {
+      router.push('../../Authority/Screen1');
+    } else {
+      router.push('../../User/Screen1');
+    }
   };
 
   return (
@@ -21,10 +81,21 @@ const SignInMainPage = () => {
       <Text style={styles.appTitle}>EcoAlert</Text>
 
       {/* Email Input */}
-      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#A9A9A9" />
-
-      {/* Password Input */}
-      <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#A9A9A9" secureTextEntry />
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        style={styles.input}
+        placeholderTextColor="#a9a9a9"
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={styles.input}
+        placeholderTextColor="#a9a9a9"
+      />
 
       {/* Forgot Password */}
       <View style={{ width: '100%' }}>
@@ -34,10 +105,13 @@ const SignInMainPage = () => {
       </View>
 
       {/* Sign In Button */}
-      <Button title="Sign in" buttonStyle={styles.signInButton} titleStyle={styles.signInTitle} />
+      <TouchableOpacity onPress={handleLogin} style={styles.signInButton}>
+        <Text style={styles.signInTitle}>Login</Text>
+      </TouchableOpacity>
+      
 
       {/* Or continue with */}
-      <Text style={styles.orText}>Or continue with</Text>
+      <Text style={styles.orText}>Or</Text>
 
       {/* Google Sign In Button */}
       <TouchableOpacity style={styles.googleButton}>

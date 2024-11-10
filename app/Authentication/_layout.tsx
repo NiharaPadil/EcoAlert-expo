@@ -34,6 +34,7 @@ export default function RootLayout() {
       <Stack.Screen name="AuthoritiesSignUp" options={{ headerShown: false }} />
       <Stack.Screen name="RegisterPage" options={{ headerShown: false }} />
       <Stack.Screen name="SignInMainPage" options={{ headerShown: false }} />
+      <Stack.Screen name="UserSignUp" options={{ headerShown: false }} />
    </Stack>
     </ThemeProvider>
   );

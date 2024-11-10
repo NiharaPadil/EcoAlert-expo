@@ -183,7 +183,7 @@ import { Alert, View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dime
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router';
 import { db, auth } from '../../constants/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc,setDoc,doc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
@@ -224,9 +224,9 @@ const AuthoritiesSignup = () => {
       // Create the user with email and password authentication
       const AuthorityCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // After successfully creating the user, add user details to Firestore
-      const Authorityref = collection(db, 'AuthorityData');
-      await addDoc(Authorityref, {
+      const user = AuthorityCredential.user;
+
+      await setDoc(doc(db,"AuthorityData",user.uid), {
         Name: name,
         Organisation: organisation,
         Designation: designation,

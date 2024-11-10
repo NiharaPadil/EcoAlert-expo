@@ -3,7 +3,7 @@ import { Alert, View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dime
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useRouter } from 'expo-router'; // Import useRouter from expo-router
 import { db, auth } from '../../constants/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc ,setDoc,doc} from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
@@ -35,9 +35,11 @@ const UserSignUp = () => {
       // Create the user with email and password authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
+      const user = userCredential.user;
+
       // After successfully creating the user, add user details to Firestore
-      const usersRef = collection(db, 'UserData');
-      await addDoc(usersRef, {
+      
+      await setDoc(doc(db,"UserData",user.uid), {
         Name: name,
         PhoneNum: phoneNum,
         Email: email,
