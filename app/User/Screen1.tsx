@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../../constants/firebaseConfig';
 import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Vibration } from 'react-native';
+
 
 const MainScreen = () => {
   const [sosActive, setSosActive] = useState(false);
@@ -61,8 +63,31 @@ const MainScreen = () => {
     router.push('./4_Blogs');
   };
 
-  const handleSosPressIn = () => {
-    setSosTimeout(setTimeout(() => {
+  // const handleSosPressIn = () => {
+  //   setSosTimeout(setTimeout(() => {
+  //     setSosActive(true);
+  //     Alert.alert(
+  //       'Emergency Alert',
+  //       'Are you sure it’s an emergency?',
+  //       [
+  //         {
+  //           text: 'Cancel',
+  //           onPress: () => setSosActive(false),
+  //           style: 'cancel'
+  //         },
+  //         { text: 'Yes', onPress: selectSosType }
+  //       ]
+  //     );
+  //   }, 3000));
+  // };
+
+
+const handleSosPressIn = () => {
+  setSosTimeout(
+    setTimeout(() => {
+      // Vibrate the device
+      Vibration.vibrate(1000); // Vibrates for 1 second
+
       setSosActive(true);
       Alert.alert(
         'Emergency Alert',
@@ -71,13 +96,14 @@ const MainScreen = () => {
           {
             text: 'Cancel',
             onPress: () => setSosActive(false),
-            style: 'cancel'
+            style: 'cancel',
           },
-          { text: 'Yes', onPress: selectSosType }
+          { text: 'Yes', onPress: selectSosType },
         ]
       );
-    }, 3000));
-  };
+    }, 3000)
+  );
+};
 
   const handleSosPressOut = () => {
     if (sosTimeout) {
