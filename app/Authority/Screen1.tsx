@@ -1,59 +1,8 @@
-// import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-// import React, { useState } from 'react';
-// import { router } from 'expo-router';
-// import { signOut } from 'firebase/auth';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { auth } from '../../constants/firebaseConfig';
 
-// const Screen1 = () => {
-//   const handleSignOut = async () => {
-//     try {
-//       await signOut(auth);
-//       await AsyncStorage.removeItem('isLoggedIn');
-//       router.replace('../Authentication/SignInMainPage'); // Adjust the path to your login page
-//     } catch (error) {
-//       console.error('Error signing out: ', error);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text>Screen1</Text>
-//       <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
-//         <Text style={styles.signOutText}>Sign Out</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
-
-// export default Screen1;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: 'white',
-//   },
-//   signOutButton: {
-//     width: 150,
-//     height: 50,
-//     backgroundColor: '#32CD32', // Green color for the button
-//     borderRadius: 10,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     marginTop: 20,
-//   },
-//   signOutText: {
-//     color: '#FFFFFF',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-// });
 
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView ,Image} from 'react-native';
 import { db } from '../../constants/firebaseConfig'; // Adjust the import path as necessary
 import { collection, onSnapshot, DocumentData } from 'firebase/firestore';
 import moment from 'moment';
@@ -124,10 +73,20 @@ const SOSAlerts = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
+      <View style={styles.header}>
+        <Image source={require('../../assets/Images/Splash1.png')} style={styles.logo} />
+        <Text style={styles.title}>EcoAlert</Text>
+      </View>
+      <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center', marginTop: 80 }}>SOS Alerts</Text>
+
+
+      <View style={styles.window}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : sosAlerts.length === 0 ? (
+            <Text style={styles.noAlertsText}>No SOS alerts available.</Text>
+          ) : (
           sosAlerts.map((alert) => (
             <View key={alert.id} style={styles.card}>
               <Text style={styles.title}>SOS Alert from {alert.name}</Text>
@@ -143,6 +102,7 @@ const SOSAlerts = () => {
           ))
         )}
       </ScrollView>
+      </View>
       <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
          <Text style={styles.signOutText}>Sign Out</Text>
        </TouchableOpacity>
@@ -154,6 +114,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  noAlertsText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  header: {
+    flexDirection: 'row', // Aligns the logo and text horizontally
+    alignItems: 'center',  // Vertically aligns them in the center
+    marginBottom: 20,
+  },
+  logo: {
+    width: 100, // Adjust width as needed
+    height: 120, // Adjust height as needed
+    marginRight: 10, // Space between logo and text
+    top: -45,
+  },
+  window: {
+    width: '90%',     // Width of the window
+    height: 400,      // Fixed height for the window
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    overflow: 'hidden', // Prevents content from overflowing the window
+    backgroundColor: '#fff',
+    margin: 20,
+    top: 120,
   },
   scrollContainer: {
     padding: 16,

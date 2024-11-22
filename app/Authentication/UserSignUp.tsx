@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useRouter } from 'expo-router'; // Import useRouter from expo-router
+import { useRouter } from 'expo-router'; 
 import { db, auth } from '../../constants/firebaseConfig';
 import { collection, addDoc ,setDoc,doc} from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
@@ -29,6 +29,11 @@ const UserSignUp = () => {
     if (!name || !phoneNum || !email || !address || !password) {
       Alert.alert('Please fill out all fields.');
       return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Password must be at least 6 characters long.');
+      return; // Exit the function if the password length is less than 6
     }
 
     try {

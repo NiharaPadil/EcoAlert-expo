@@ -1,159 +1,14 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, StyleSheet, Image, Pressable, ActivityIndicator, TouchableOpacity,Button } from 'react-native';
-// import { db } from '../../constants/firebaseConfig';
-// import { collection, onSnapshot, DocumentData } from 'firebase/firestore';
-// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-// import moment from 'moment';
-// import { useNavigation } from '@react-navigation/native';
-// import { useRouter } from 'expo-router';
-
-// import BlogDetail from './5_BlogDetail'
-// interface Blog {
-//   id: string;
-//   author: string;
-//   content: string;
-//   timestamp: string;
-//   title: string;
-//   type: string;
-//   image: string;
-// }
-
-// const BlogViewer = () => {
-//   const router= useRouter();
-//   const [blogs, setBlogs] = useState<Blog[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const navigation = useNavigation(); // Use navigation hook
-
-//   useEffect(() => {
-//     const unsubscribe = onSnapshot(collection(db, 'Blogs'), (snapshot) => {
-//       const fetchedBlogs = snapshot.docs.map((doc) => {
-//         const docData = doc.data() as DocumentData;
-//         const timestamp = docData.TimeStamp; // Adjust if the field name is different
-//         const formattedTimestamp = timestamp 
-//           ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A') 
-//           : 'Unknown Time';
-        
-//         return {
-//           id: doc.id,
-//           author: docData.Author,
-//           content: docData.Content,
-//           timestamp: formattedTimestamp,
-//           title: docData.Title,
-//           type: docData.Type,
-//           image: docData.imageurl,
-//         } as Blog;
-//       });
-      
-//       setBlogs(fetchedBlogs);
-//       setLoading(false);
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-//   const handleReadMore = (blog: Blog) => {
-//     router.push(`./5_BlogDetail?id=${blog.id}`) // Navigate to BlogDetail and pass the blog data
-//   };
-
-//   const handleCreateBlog = () => {
-//     router.push('./6_CreateBlog'); // Navigate to the CreateBlog page
-//   };
-
-//   return (
-    
-//     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-//       {loading ? (
-//         <ActivityIndicator size="large" color="#0000ff" />
-//       ) : (
-//         blogs.map((blog) => (
-//           <View key={blog.id} style={styles.card}>
-//             <Image source={{ uri: blog.image }} style={styles.image} />
-//             <Text style={styles.title}>{blog.title}</Text>
-//             <Text style={styles.author}>By {blog.author}</Text>
-//             <Text style={styles.timestamp}>{blog.timestamp}</Text>
-//             <Text numberOfLines={2} style={styles.content}>{blog.content}</Text>
-//             <TouchableOpacity onPress={() => handleReadMore(blog)} style={styles.readMoreButton}>
-//               <Text style={styles.readMoreText}>READ MORE</Text>
-//             </TouchableOpacity>
-            
-//           </View>
-//         ))
-//       )}
-//        <TouchableOpacity onPress={handleCreateBlog} style={styles.createBlogButton}>
-//         <Text style={styles.createBlogText}>CREATE A BLOG</Text>
-//       </TouchableOpacity>
-//     </KeyboardAwareScrollView>
-    
-  
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     padding: 16,
-//     backgroundColor: 'white',
-//     height: '100%',
-//   },
-//   card: {
-//     marginBottom: 16,
-//     padding: 16,
-//     backgroundColor: '#f9f9f9',
-//     borderRadius: 8,
-//     elevation: 2,
-//   },
-//   image: {
-//     width: '100%',
-//     height: 150,
-//     borderRadius: 8,
-//   },
-//   title: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     marginVertical: 8,
-//   },
-//   author: {
-//     fontSize: 14,
-//     color: 'black',
-//   },
-//   timestamp: {
-//     fontSize: 12,
-//     color: '#999',
-//     marginBottom: 8,
-//   },
-//   content: {
-//     fontSize: 14,
-//     color: '#333',
-//   },
-//   readMoreButton: {
-//     marginTop: 10,
-//     padding: 10,
-//     backgroundColor: '#007AFF',
-//     borderRadius: 5,
-//     alignItems: 'center',
-//   },
-//   readMoreText: {
-//     color: 'white',
-//     fontWeight: 'bold',
-//   },
-//   createBlogButton: {
-//     marginTop: 20,
-//     padding: 15,
-//     backgroundColor: '#28A745',
-//     borderRadius: 5,
-//     alignItems: 'center',
-//   },
-//   createBlogText: {
-//     color: 'white',
-//     fontWeight: 'bold',
-//     fontSize: 16,
-//   },
-// });
-
-// export default BlogViewer;
-
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+} from 'react-native';
 import { db } from '../../constants/firebaseConfig';
 import { collection, onSnapshot, DocumentData } from 'firebase/firestore';
 import moment from 'moment';
@@ -173,12 +28,14 @@ const BlogViewer = () => {
   const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
+  const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'Blogs'), (snapshot) => {
       const fetchedBlogs = snapshot.docs.map((doc) => {
         const docData = doc.data() as DocumentData;
-        const timestamp = docData.TimeStamp; 
+        const timestamp = docData.TimeStamp;
         const formattedTimestamp = timestamp
           ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
           : 'Unknown Time';
@@ -195,6 +52,7 @@ const BlogViewer = () => {
       });
 
       setBlogs(fetchedBlogs);
+      setFilteredBlogs(fetchedBlogs);
       setLoading(false);
     });
 
@@ -209,19 +67,61 @@ const BlogViewer = () => {
     router.push('./6_CreateBlog');
   };
 
+  const handleSearch = (text: string) => {
+    setSearchText(text);
+  
+    if (text === '') {
+      setFilteredBlogs(blogs); // Reset to full list if search is cleared
+    } else {
+      const filtered = blogs.filter((blog) => {
+        // Safely check if the properties exist before calling toLowerCase()
+        const title = blog.title?.toLowerCase() || '';
+        const author = blog.author?.toLowerCase() || '';
+        const type = blog.type?.toLowerCase() || '';
+  
+        return (
+          title.includes(text.toLowerCase()) ||
+          author.includes(text.toLowerCase()) ||
+          type.includes(text.toLowerCase())
+        );
+      });
+      setFilteredBlogs(filtered);
+    }
+  };
+  
+
   return (
     <View style={styles.container}>
+      {/* Title */}
+      <View style={styles.header}>
+        <Image source={require('../../assets/Images/Splash1.png')} style={styles.logo} />
+        <Text style={styles.title1}>EcoAlert</Text>
+      </View>
+
+      {/* Search Bar */}
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search by title, author, or type..."
+        placeholderTextColor="#A5D6A7"
+        value={searchText}
+        onChangeText={handleSearch}
+      />
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="#28A745" />
         ) : (
-          blogs.map((blog) => (
+          filteredBlogs.map((blog) => (
             <View key={blog.id} style={styles.card}>
               <Image source={{ uri: blog.image }} style={styles.image} />
-              <Text style={styles.title}>{blog.title}</Text>
-              <Text style={styles.author}>By {blog.author}</Text>
-              <Text style={styles.timestamp}>{blog.timestamp}</Text>
-              <Text numberOfLines={2} style={styles.content}>{blog.content}</Text>
+              <View style={styles.infoContainer}>
+                <Text style={styles.title}>{blog.title}</Text>
+                <Text style={styles.author}>By {blog.author}</Text>
+                <Text style={styles.timestamp}>{blog.timestamp}</Text>
+                <Text numberOfLines={2} style={styles.content}>
+                  {blog.content}
+                </Text>
+              </View>
               <TouchableOpacity onPress={() => handleReadMore(blog)} style={styles.readMoreButton}>
                 <Text style={styles.readMoreText}>READ MORE</Text>
               </TouchableOpacity>
@@ -240,51 +140,86 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+    justifyContent: 'center',
+    //alignItems: 'center',
+
+  },
+  screenTitle: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#2E7D32', // Dark green
+    textAlign: 'center',
+    marginVertical: 16,
+    bottom: -40,
+    marginBottom: 70,
+  },
+  searchBar: {
+    height: 40,
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    color: '#388E3C', // Medium green for text
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    marginBottom: 16,
   },
   scrollContainer: {
     padding: 16,
-    paddingBottom: 100, // Add padding to ensure content is above the button
+    paddingBottom: 100,
   },
   card: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    elevation: 2,
+    marginBottom: 30,
+    backgroundColor: 'white',
+    borderRadius: 28,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    height: 330,
   },
   image: {
     width: '100%',
     height: 150,
-    borderRadius: 8,
+  },
+  infoContainer: {
+    padding: 16,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 8,
+    color: '#2E7D32', // Dark green for the title
+    marginBottom: 8,
   },
   author: {
     fontSize: 14,
-    color: 'black',
+    color: '#388E3C', // Medium green for the author
   },
   timestamp: {
     fontSize: 12,
-    color: '#999',
+    color: '#7CB342', // Light green for the timestamp
     marginBottom: 8,
   },
   content: {
     fontSize: 14,
-    color: '#333',
+    color: '#4CAF50', // Balanced green for the content
   },
   readMoreButton: {
     marginTop: 10,
-    padding: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
+    padding: 12,
+    backgroundColor: '#43A047', // Vibrant green button
     alignItems: 'center',
   },
   readMoreText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   createBlogButton: {
     position: 'absolute',
@@ -292,8 +227,8 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     padding: 15,
-    backgroundColor: '#28A745',
-    borderRadius: 5,
+    backgroundColor: '#2E7D32', // Dark green button
+    borderRadius: 8,
     alignItems: 'center',
   },
   createBlogText: {
@@ -301,6 +236,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  header: {
+    flexDirection: 'row', // Aligns the logo and text horizontally
+    alignItems: 'center',  // Vertically aligns them in the center
+    marginBottom: 60,
+  },
+  logo: {
+    width: 90, // Adjust width as needed
+    height: 90, // Adjust height as needed
+    marginRight: 110, // Space between logo and text
+    position: 'absolute', // Ensure it's positioned relative to its container
+    top: 20, // Adjust as needed for alignment
+    right: 10, // Adjust to place it appropriately inside the container
+  },
+  
+  title1: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
+    marginTop: 50, // Space above the title
+    alignSelf: 'center', 
+    right: -130, // Adjust to place it appropriately inside the container
+    
+  },
+
 });
 
 export default BlogViewer;

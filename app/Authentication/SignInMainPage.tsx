@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width, height } = Dimensions.get('window');
 
 const SignInMainPage = () => {
-  const router = useRouter(); // Using expo-router for navigation
+  const router = useRouter(); 
   const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -28,10 +28,6 @@ const SignInMainPage = () => {
       // Retrieve user data from Firestore using uid
       const userDoc = await getDoc(doc(db, 'UserData', user.uid));
       const AuthDoc = await getDoc(doc(db, 'AuthorityData', user.uid));
-      
-      // if (userDoc.exists())
-      //   console.log("exists");
-      // else console.log("not exists");
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
