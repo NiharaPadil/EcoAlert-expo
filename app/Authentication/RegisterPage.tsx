@@ -28,7 +28,7 @@ const RegisterPage = () => {
       <Text style={styles.appTitle}>EcoAlert</Text>
 
       {/* Register Area with Image */}
-      <TouchableOpacity style={styles.registerContainer} onPress={user}>
+      <TouchableOpacity style={[styles.registerContainer, { marginBottom: -20 }]} onPress={user}>
         <Image
           source={require('../../assets/Images/user.png')} // Update with your image path
           style={styles.registerImage}
@@ -79,13 +79,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: width * 0.8,
-    height: 90,
-    backgroundColor: '#FFFFFF',
+    height: 125,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     borderRadius: 300,
     borderWidth: 1,
     borderColor: '#000',
     marginVertical: height * 0.05,
+    top: -50,
   },
   registerImage: {
     width: 60,

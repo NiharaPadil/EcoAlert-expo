@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput,StyleSheet, Alert,Image,TouchableOpacity } from 'react-native';
 import { db } from '../../constants/firebaseConfig';
 import { addDoc, collection } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
@@ -34,7 +34,15 @@ const CreateBlog = ({ navigation}:any) => {
   };
 
   return (
+
     <View style={styles.container}>
+
+
+<View style={styles.header}>
+        <Image source={require('../../assets/Images/Splash1.png')} style={styles.logo} />
+        <Text style={styles.title}>EcoAlert</Text>
+      </View>
+
       <Text style={styles.label}>Title</Text>
       <TextInput
         style={styles.input}
@@ -64,7 +72,13 @@ const CreateBlog = ({ navigation}:any) => {
         onChangeText={setImage}
       />
 
-      <Button title="Create Blog" onPress={handleSubmit} />
+      
+
+      <TouchableOpacity onPress={handleSubmit} style={styles.postblogbutton}>
+        <Text style={styles.postblogtext}>Post Blog</Text>
+      </TouchableOpacity>
+
+
     </View>
   );
 };
@@ -77,18 +91,66 @@ const styles = StyleSheet.create({
     //make it a little bit down
     
   },
+
+  header: {
+    flexDirection: 'row', // Aligns the logo and text horizontally
+    alignItems: 'center',  // Vertically aligns them in the center
+    marginBottom: 50,
+    top: 80,
+    left: 5,
+  },
+  logo: {
+    width: 80, // Adjust width as needed
+    height: 100, // Adjust height as needed
+    marginRight: 10, // Space between logo and text
+    top: -40,
+    left: 220,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginTop: -50,
+    marginBottom: 25,
+  },
   label: {
-    marginTop: 26,
+    fontSize: 18,
+    marginTop: 36,
     marginBottom: 1,
     fontWeight: 'bold',
   },
+ 
+
   input: {
+    width: '100%',
+    height: 50,
+    borderColor: '#32CD32',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 16,
-  },
+    borderRadius: 19,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    marginBottom: 0,
+    fontSize: 16,
+ },
+ postblogtext: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  textAlign: 'center',
+  width: '100%',
+},
+postblogbutton: {
+  width: '70%',
+  backgroundColor: '#D1FFBD',
+  height: 50,
+  borderRadius: 50,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginVertical: 10,
+  top: 20,
+  marginTop: 40,
+  borderWidth: 1,
+  left:55
+  
+},
 });
 
 export default CreateBlog;
