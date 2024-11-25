@@ -13,12 +13,13 @@ import {
   getFirestore,
   collection,
   onSnapshot,
+  addDoc,
   DocumentData,
 } from 'firebase/firestore';
 import moment from 'moment';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../../constants/firebaseConfig'; // Adjust the import path as necessary
+import { auth } from '../../constants/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -40,12 +41,28 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
-
-  const handleSend = () => {
-    if (message.trim()) {
-      console.log('Message sent:', message);
-      setMessage(''); // Clear input after sending
+  const handleSend = async () => {
+    if (message.trim() === '') {
+      alert('Message cannot be empty!');
+      return;
     }
+
+    try {
+      const docRef = await addDoc(collection(db, 'Broadcast'), {
+        message,
+        timestamp: new Date().toISOString(),
+      });
+      console.log('Message sent with ID:', docRef.id);
+      alert('Message Broadcasted Successfully!');
+      setMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send the message.');
+    }
+  };
+
+  const handleViewDetails = (alert: SOSAlert) => {
+    router.push(`./2_SOSDetail?id=${alert.id}`);
   };
 
   const handleBlogPage = () => {
@@ -56,24 +73,11 @@ export default function HomePage() {
     try {
       await signOut(auth);
       await AsyncStorage.removeItem('isLoggedIn');
-      router.replace('../Authentication/SignInMainPage'); // Adjust the path to your login page
+      router.replace('../Authentication/SignInMainPage');
     } catch (error) {
-      console.error('Error signing out: ', error);
+      console.error('Error signing out:', error);
     }
   };
-
-  const handleBroadcast = () => {
-    Alert.alert('Broadcast Initiated', 'Broadcast message sent successfully!');
-  };
-
-  const handleViewDetails = (alert: SOSAlert) => {
-    router.push(`./2_SOSDetail?id=${alert.id}`); // Adjust the route as needed
-  };
-
-  
- 
-  
-  
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'SOS'), (snapshot) => {
@@ -92,8 +96,8 @@ export default function HomePage() {
           status: docData.status,
           timestamp: formattedTimestamp,
           type: docData.type,
-          latitude: docData.location.latitude,
-          longitude: docData.location.longitude,
+          latitude: docData.location?.latitude || 0,
+          longitude: docData.location?.longitude || 0,
         } as SOSAlert;
       });
 
@@ -106,7 +110,6 @@ export default function HomePage() {
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
       <View style={styles.header}>
         <Image
           source={require('../../assets/Images/Splash1.png')}
@@ -115,28 +118,22 @@ export default function HomePage() {
         <Text style={styles.title}>EcoAlert</Text>
       </View>
 
-      {/* Logout Button */}
       <TouchableOpacity onPress={handleSignOut} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
 
-      {/* Message Input with Send Button */}
-<View style={styles.messageContainer}>
-  <TextInput
-    style={styles.input}
-    placeholder="Broadcast message..."
-    placeholderTextColor="#ccc"
-    value={message}
-    onChangeText={setMessage}
-  />
-  <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-    <Ionicons name="send" size={20} color="black" />
-  </TouchableOpacity>
-</View>
-
-    
-
-
+      <View style={styles.messageContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Broadcast message..."
+          placeholderTextColor="#ccc"
+          value={message}
+          onChangeText={setMessage}
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+          <Ionicons name="send" size={20} color="black" />
+        </TouchableOpacity>
+      </View>
 
       {/* SOS Alerts Section */}
       <Text style={styles.sectionTitle}>SOS Alerts</Text>
@@ -169,9 +166,8 @@ export default function HomePage() {
       </ScrollView>
 
 
-
-            {/* Reports Section */}
-            <Text style={styles.sectionTitle}>Reports </Text>
+      {/* Reports Section */}
+      <Text style={styles.sectionTitle}>Reports </Text>
             <ScrollView style={styles.scrollView}>
         <View style={styles.section}>
           
@@ -211,10 +207,12 @@ export default function HomePage() {
       </TouchableOpacity>
 
 
+
+
+
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
