@@ -94,7 +94,7 @@ const Index = () => {
         router.replace('../User/Screen1'); // Adjust the path according to your structure
         break;
       case 'Authority':
-        router.replace('../Authority/Screen1'); // Adjust the path according to your structure
+        router.replace('../Authority/Screen2'); // Adjust the path according to your structure
         break;
       default:
         router.replace('../Authentication/Splash1'); // Adjust the path according to your structure
