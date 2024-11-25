@@ -6,6 +6,7 @@ import { auth, db } from '../../constants/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 
 const SignInMainPage = () => {
@@ -13,6 +14,11 @@ const SignInMainPage = () => {
   const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordHidden(!isPasswordHidden);
+  };
 
   const RegisterPage = () => {
     router.push('/Authentication/RegisterPage'); // Navigate to RegisterPage
@@ -84,14 +90,24 @@ const SignInMainPage = () => {
         style={styles.input}
         placeholderTextColor="#a9a9a9"
       />
+
+      {/* Password Input */}
       <TextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={isPasswordHidden}
         style={styles.input}
         placeholderTextColor="#a9a9a9"
       />
+      <TouchableOpacity onPress={togglePasswordVisibility}>
+        <Ionicons
+          name={isPasswordHidden ? 'eye-off' : 'eye'}
+          size={20}
+          color="#666"
+          style={{ position: 'absolute', left: 165, top: -45 }}
+        />
+      </TouchableOpacity>
 
       {/* Forgot Password */}
       <View style={{ width: '100%' }}>
@@ -159,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 10,
     fontSize: 16,
-  },
+ },
   forgotText: {
     alignSelf: 'flex-end',
     color: '#32CD32',
@@ -222,6 +238,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#32CD32',
     fontWeight: 'bold',
+  },
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
+    marginVertical: 10,
   },
 });
 
