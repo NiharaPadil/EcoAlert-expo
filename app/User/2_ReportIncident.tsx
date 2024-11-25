@@ -155,6 +155,9 @@ export default function UploadScreen() {
         ) : (
           <Text style={styles.plusSign}>+</Text>
         )}
+
+
+
       </TouchableOpacity>
       <View style={styles.labelContainer}>
         <Text style={styles.uploadLabel}>Click/Upload Picture</Text>
@@ -171,6 +174,8 @@ export default function UploadScreen() {
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
+
+      
       {errorMsg ? <Text>{errorMsg}</Text> : null}
     </View>
   );

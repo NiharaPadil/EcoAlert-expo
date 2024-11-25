@@ -63,24 +63,6 @@ const MainScreen = () => {
     router.push('./4_Blogs');
   };
 
-  // const handleSosPressIn = () => {
-  //   setSosTimeout(setTimeout(() => {
-  //     setSosActive(true);
-  //     Alert.alert(
-  //       'Emergency Alert',
-  //       'Are you sure it’s an emergency?',
-  //       [
-  //         {
-  //           text: 'Cancel',
-  //           onPress: () => setSosActive(false),
-  //           style: 'cancel'
-  //         },
-  //         { text: 'Yes', onPress: selectSosType }
-  //       ]
-  //     );
-  //   }, 3000));
-  // };
-
 
 const handleSosPressIn = () => {
   setSosTimeout(
