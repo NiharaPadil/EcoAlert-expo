@@ -118,9 +118,9 @@ const BlogViewer = () => {
                 <Text style={styles.title}>{blog.title}</Text>
                 <Text style={styles.author}>By {blog.author}</Text>
                 <Text style={styles.timestamp}>{blog.timestamp}</Text>
-                <Text numberOfLines={2} style={styles.content}>
+                {/* <Text numberOfLines={2} style={styles.content}>
                   {blog.content}
-                </Text>
+                </Text> */}
               </View>
               <TouchableOpacity onPress={() => handleReadMore(blog)} style={styles.readMoreButton}>
                 <Text style={styles.readMoreText}>READ MORE</Text>
@@ -182,7 +182,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    height: 330,
+    height: 280,
+    //position: 'absolute',
   },
   image: {
     width: '100%',
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#2E7D32', // Dark green for the title
-    marginBottom: 8,
+    marginBottom: 0,
   },
   author: {
     fontSize: 14,
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 12,
     color: '#7CB342', // Light green for the timestamp
-    marginBottom: 8,
+    marginBottom: -19,
   },
   content: {
     fontSize: 14,
@@ -213,8 +214,11 @@ const styles = StyleSheet.create({
   readMoreButton: {
     marginTop: 10,
     padding: 12,
+    bottom: 0,
+    width: '100%',
     backgroundColor: '#43A047', // Vibrant green button
     alignItems: 'center',
+    position: 'absolute',
   },
   readMoreText: {
     color: 'white',

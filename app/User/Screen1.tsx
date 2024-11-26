@@ -8,7 +8,7 @@ import * as Location from 'expo-location';
 import { signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../../constants/firebaseConfig';
-import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getFirestore, onSnapshot, DocumentData } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Vibration } from 'react-native';
 
@@ -17,6 +17,29 @@ const MainScreen = () => {
   const [sosActive, setSosActive] = useState(false);
   const [sosTimeout, setSosTimeout] = useState<NodeJS.Timeout | null>(null);
   const [userInfo, setUserInfo] = useState({ Name: '', PhoneNum: '' });
+  const db = getFirestore();
+  interface BroadcastMessage {
+    id: string;
+    message: any;
+    timestamp: any;
+  }
+  
+  const [broadcastMessage, setBroadcastMessage] = useState<BroadcastMessage[]>([]);
+
+useEffect(() => {
+  // Real-time listener for Broadcast messages
+  const unsubscribe = onSnapshot(collection(db, 'Broadcast'), (snapshot) => {
+    const messages = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      message: doc.data().message,
+      timestamp: doc.data().timestamp,
+    }));
+    setBroadcastMessage(messages);
+  });
+
+  return () => unsubscribe(); // Clean up listener on unmount
+}, []);
+
 
   useEffect(() => {
     // Fetch user information from Firestore based on current user's uid
@@ -39,6 +62,9 @@ const MainScreen = () => {
 
     fetchUserInfo();
   }, []);
+
+
+  
 
   const handleSignOut = async () => {
     try {
@@ -147,62 +173,81 @@ const handleSosPressIn = () => {
   };
 
   return (
-    // <View style={styles.container}>
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Image source={require('../../assets/Images/Splash1.png')} style={styles.logo} />
+        <Image
+          source={require('../../assets/Images/Splash1.png')}
+          style={styles.logo}
+        />
         <Text style={styles.title}>EcoAlert</Text>
       </View>
-      <TouchableOpacity style={[styles.button, {right:50,marginTop:-50}]} onPress={handleReportIncident}>
-  <Image 
-    source={require('../../assets/Images/report.png')} // Update with your image path
-    style={styles.icon} 
-  />
-  <Text style={styles.buttonText}>Report Incident</Text>
-</TouchableOpacity>
 
+      <Text style={styles.broadcastTitle}>Broadcast Notifications</Text>
+<ScrollView style={styles.scrollContainer}>
+{broadcastMessage && Array.isArray(broadcastMessage) && broadcastMessage.length > 0 ? (
+  broadcastMessage.map((message : any) => (
+    <View key={message.id} style={styles.notificationCard}>
+      <Text style={styles.messageText}>{message.message}</Text>
+    </View>
+  ))
+) : (
+  <View style={styles.noMessagesContainer}>
+    <Text style={styles.noMessagesText}>No messages to display</Text>
+  </View>
+)}
 
-
-
-   <TouchableOpacity style={[styles.button,{left:50,width:270}]} onPress={handleBlogPage}>
-   <Image 
-    source={require('../../assets/Images/blog.png')} // Update with your image path
-    style={[styles.icon,{left:10}]} 
-  />
-
-        <Text style={styles.buttonText}>Blog Page</Text>
-      </TouchableOpacity>
-
-
-
-
-      <TouchableOpacity style={[styles.alertButton,{top:20}]} onPress={handleAlertsInYourArea}>
-        <Text style={styles.alertText}>Alerts in Your Area</Text>
-      </TouchableOpacity>
-
-
+</ScrollView>
 
 
       <TouchableOpacity
-        style={[styles.sosButton, { top: 30 }]} 
-  
+        style={[styles.button, { right: 50, marginTop: -50 }]}
+        onPress={handleReportIncident}
       >
+        <Image
+          source={require('../../assets/Images/report.png')}
+          style={styles.icon}
+        />
+        <Text style={styles.buttonText}>Report Incident</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { left: 50, width: 270 }]}
+        onPress={handleBlogPage}
+      >
+        <Image
+          source={require('../../assets/Images/blog.png')}
+          style={[styles.icon, { left: 10 }]}
+        />
+        <Text style={styles.buttonText}>Blog Page</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.alertButton, { top: 20 }]}
+        onPress={handleAlertsInYourArea}
+      >
+        <Text style={styles.alertText}>Alerts in Your Area</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.sosButton, { top: 30 }]}>
         <TouchableOpacity
           onPressIn={handleSosPressIn}
           onPressOut={handleSosPressOut}
           style={styles.touchable}
         >
           <Text style={styles.sosText}>SOS</Text>
-          <Text style={[styles.sosText,{marginTop:10,fontSize:20,textAlign:'center'}]}>Press and hold for 3 Seconds</Text>
+          <Text style={[styles.sosText, styles.sosInstruction]}>
+            Press and hold for 3 Seconds
+          </Text>
         </TouchableOpacity>
       </TouchableOpacity>
 
-
-
-      <TouchableOpacity onPress={handleSignOut} style={[styles.signOutButton,{top:30}]}>
+      <TouchableOpacity
+        onPress={handleSignOut}
+        style={[styles.signOutButton, { top: 30 }]}
+      >
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
-      </ScrollView>
+    </ScrollView>
   );
 };
 
@@ -219,6 +264,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Aligns the logo and text horizontally
     alignItems: 'center',  // Vertically aligns them in the center
     marginBottom: 20,
+    marginTop: 80,
   },
   logo: {
     width: 100, // Adjust width as needed
@@ -231,7 +277,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: -50,
     marginBottom: 25,
-  },
+  }
+  ,
   subtitle: {
     fontSize: 18,
     marginBottom: 20,
@@ -277,8 +324,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sosButton: {
-    width: 250,
-    height: 250,
+    width: 200,
+    height: 200,
     borderRadius: 125,
     justifyContent: 'center',
     alignItems: 'center',
@@ -286,6 +333,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffe6e6',
     borderColor: 'red', 
     borderWidth: 2,
+    padding: 10,
+    textAlign: 'center',
   },
   sosText: {
     fontSize: 30,
@@ -308,11 +357,85 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 60,
   },
   signOutText: {
     color: '#32CD32',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  
+  notificationCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 80,
+    maxHeight: 30,
+    padding: 0,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    height: 80,
+    width: 350,
+  },
+  messageText: {
+    fontSize: 16,
+    color: 'black',
+    textAlign: 'center',
+   // alignContent: 'center',
+    justifyContent: 'center',
+    marginTop: 5,
+   
+  },
+ 
+  noMessagesText: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 50,
+  },
+  noMessagesContainer: {
+    height: 50, // Smaller height
+    width: '100%', // Consistent width
+    backgroundColor: '#f9f9f9', // Subtle background color
+    borderRadius: 8,
+    elevation: 1, // Reduced shadow for a minimal look
+    shadowColor: '#000',
+    shadowOpacity: 0.05, // Lighter shadow
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: -45, // Reduced padding for a cleaner appearance
+  
+
+  },scrollContainer: {
+    maxHeight: 200, // Limits height of the scrollable area
+    width: '80%',
+    height: '90%',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    padding: 10,
+    marginBottom: 60,
+  },
+  sosInstruction: {
+    fontSize: 16,
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  broadcastTitle: {
+
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: -50,
   },
  
 });
