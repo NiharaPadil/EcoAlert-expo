@@ -1,16 +1,23 @@
 import React , {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions ,Alert} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions ,Alert,Vibration,} from 'react-native';
 import { Button } from 'react-native-elements';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../../constants/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 const { width, height } = Dimensions.get('window');
+
+
 
 const SignInMainPage = () => {
   const router = useRouter(); 
+
+  const [sosTimeout, setSosTimeout] = React.useState<null | NodeJS.Timeout>(null);
+  const [sosActive, setSosActive] = useState(false);
+
   const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -71,6 +78,93 @@ const SignInMainPage = () => {
       router.push('../../Authority/Screen1');
     } else {
       router.push('../../User/Screen1');
+    }
+  };
+
+
+  // SOS Button Handlers
+  const handleSosPressIn = () => {
+    setSosTimeout(
+      setTimeout(() => {
+        // Vibrate the device
+        Vibration.vibrate(1000); // Vibrates for 1 second
+
+        setSosActive(true);
+        Alert.alert(
+          'Emergency Alert',
+          'Are you sure it’s an emergency?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => setSosActive(false),
+              style: 'cancel',
+            },
+            { text: 'Yes', onPress: selectSosType },
+          ]
+        );
+      }, 3000)
+    );
+  };
+
+  const handleSosPressOut = () => {
+    if (sosTimeout) {
+      clearTimeout(sosTimeout);
+    }
+    setSosActive(false);
+  };
+
+  const selectSosType = () => {
+    Alert.alert(
+      'SOS Type',
+      'Please select the type of emergency:',
+      [
+        {
+          text: 'Tree Cutting',
+          onPress: () => sendSosAlert('Tree Cutting'),
+        },
+        {
+          text: 'Animal Poaching',
+          onPress: () => sendSosAlert('Animal Poaching'),
+        },
+      ]
+    );
+  };
+
+  const sendSosAlert = async (type: string) => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Denied',
+          'Location permissions are required for SOS alert.'
+        );
+        return;
+      }
+  
+      let location = await Location.getCurrentPositionAsync({});
+      const user = auth.currentUser;
+  
+      if (user) {
+        await addDoc(collection(db, 'SOS'), {
+          name: 'Unknown User', // Replace with userInfo.Name if available
+          phonenumber: 'Not provided', // Replace with userInfo.PhoneNum if available
+          status: 'none',
+          timestamp: new Date(),
+          type,
+          location: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+          userid: user.uid,
+        });
+  
+        Alert.alert(
+          'SOS Sent',
+          'SOS HAS BEEN SENT TO NEARBY AUTHORITIES. THEY WILL ARRIVE SOON.'
+        );
+      }
+    } catch (error) {
+      console.error('Error sending SOS alert: ', error);
     }
   };
 
@@ -141,6 +235,15 @@ const SignInMainPage = () => {
           <Text style={styles.signUpLink}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+
+      {/* SOS Button */}
+      <TouchableOpacity
+        style={styles.sosButton}
+        onPressIn={handleSosPressIn}
+        onPressOut={handleSosPressOut}
+      >
+        <Text style={styles.sosButtonText}>SOS (Hold for 3 sec)</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -248,6 +351,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#fff',
     marginVertical: 10,
+  },
+  sosButton: {
+    width: width * 0.6,
+    height: 50,
+    backgroundColor: '#ffe6e6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 125,
+    marginBottom: height * 0.05,
+    borderColor: 'red',
+    borderWidth: 2,
+    textAlign: 'center',
+    top: 30,
+    
+  },
+  sosButtonText: {
+    fontSize: 18,
+    color: 'red',
+    fontWeight: 'bold',
   },
 });
 

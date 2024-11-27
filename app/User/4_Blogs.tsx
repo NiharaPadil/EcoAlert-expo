@@ -241,9 +241,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   header: {
+    marginTop:60,
     flexDirection: 'row', // Aligns the logo and text horizontally
     alignItems: 'center',  // Vertically aligns them in the center
-    marginBottom: 60,
+    marginBottom: 40,
   },
   logo: {
     width: 90, // Adjust width as needed
