@@ -228,7 +228,7 @@ const handleSosPressIn = () => {
         <Text style={styles.alertText}>Alerts in Your Area</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.sosButton, { top: 30 }]}>
+      <TouchableOpacity style={[styles.sosButton, { top: 10 }]}>
         <TouchableOpacity
           onPressIn={handleSosPressIn}
           onPressOut={handleSosPressOut}
@@ -264,13 +264,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Aligns the logo and text horizontally
     alignItems: 'center',  // Vertically aligns them in the center
     marginBottom: 20,
-    marginTop: 80,
+    marginTop: 130,
   },
   logo: {
     width: 100, // Adjust width as needed
-    height: 120, // Adjust height as needed
+    height: 100, // Adjust height as needed
     marginRight: 10, // Space between logo and text
     top: -45,
+    
   },
   title: {
     fontSize: 32,
@@ -335,6 +336,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 10,
     textAlign: 'center',
+    marginBottom:-25
   },
   sosText: {
     fontSize: 30,
@@ -413,16 +415,17 @@ const styles = StyleSheet.create({
   },scrollContainer: {
     maxHeight: 200, // Limits height of the scrollable area
     width: '80%',
-    height: '90%',
+    //height: '50%',
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    elevation: 2,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.5,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 10, height: 20 },
     padding: 10,
-    marginBottom: 60,
+    marginBottom: 80,
+    marginTop:10
   },
   sosInstruction: {
     fontSize: 16,
@@ -432,9 +435,9 @@ const styles = StyleSheet.create({
   },
   broadcastTitle: {
 
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 0,
     marginTop: -50,
   },
  

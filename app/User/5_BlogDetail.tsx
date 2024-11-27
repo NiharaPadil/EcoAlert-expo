@@ -1,6 +1,6 @@
 // app/BlogDetail.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Button, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useRouter,useLocalSearchParams } from 'expo-router'; // Use useSearchParams
 import { db } from '../../constants/firebaseConfig'; // Ensure your db is correctly imported
 import { doc, getDoc } from 'firebase/firestore';
@@ -67,12 +67,16 @@ const BlogDetail = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.card}>
       <Image source={{ uri: blog.image }} style={styles.image} />
       <Text style={styles.title}>{blog.title}</Text>
       <Text style={styles.author}>By {blog.author}</Text>
       <Text style={styles.timestamp}>{blog.timestamp}</Text>
       <Text style={styles.content}>{blog.content}</Text>
-      <Button title="Go Back" onPress={() => router.back()} />
+      <TouchableOpacity onPress={() => router.back()} style={styles.goback}>
+        <Text style={styles.title}>Go Back</Text>
+      </TouchableOpacity>
+    </View>
     </View>
   );
 };
@@ -106,6 +110,24 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 16,
     color: '#333',
+  },
+  card:{
+    marginTop:100
+  },
+  goback: {
+    width: '70%',
+    backgroundColor: '#D1FFBD',
+    height: 50,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
+    top: 20,
+    marginTop: 40,
+    borderWidth: 1,
+    left:55,
+    bottom:10
+    
   },
 });
 
