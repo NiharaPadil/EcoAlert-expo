@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Button, Image, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { db } from '../../constants/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import moment from 'moment';
 import MapView, { Marker } from 'react-native-maps';
 
-interface Incident {
+interface IncidentReport {
   id: string;
   title: string;
   description: string;
   status: string;
   timestamp: string;
   location: { latitude: number; longitude: number };
-  reporterName: string;
-  contactNumber: string;
+  phoneNumber: string;
+  assignedTo: string;
+  photoUrl: string;
 }
 
 const IncidentDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const [incident, setIncident] = useState<Incident | null>(null);
+  const [incident, setIncident] = useState<IncidentReport | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,19 +31,24 @@ const IncidentDetail = () => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const docData = docSnap.data();
-        const formattedTimestamp = docData.timestamp
-          ? moment(new Date(docData.timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
+
+        // Correct timestamp handling: Ensure timestamp is processed correctly
+        const timestamp = docData.Time;  // Ensure this matches your Firestore field name
+        const formattedTimestamp = timestamp
+          ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
           : 'Unknown Time';
 
+        // Mapping Firestore document data to IncidentReport interface
         setIncident({
           id: docSnap.id,
-          title: docData.title,
-          description: docData.description,
-          status: docData.status,
+          title: docData.title || 'No Title',
+          description: docData.description || 'No Description',
+          status: docData.status || 'Unknown',
           timestamp: formattedTimestamp,
-          location: docData.location,
-          reporterName: docData.reporterName,
-          contactNumber: docData.contactNumber,
+          location: docData.location || { latitude: 0, longitude: 0 },
+          phoneNumber: docData.PhoneNumber || 'Unknown', // Mapped from Firestore field 'PhoneNumber'
+          assignedTo: docData.assigneto || 'Unassigned', // Mapped from Firestore field 'assigneto'
+          photoUrl: docData.photourl || '', // Mapped from Firestore field 'photourl'
         });
       } else {
         console.log('No such Incident report!');
@@ -67,13 +73,20 @@ const IncidentDetail = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{incident.title}</Text>
       <Text style={styles.label}>Description: <Text style={styles.value}>{incident.description}</Text></Text>
-      <Text style={styles.label}>Reporter: <Text style={styles.value}>{incident.reporterName}</Text></Text>
-      <Text style={styles.label}>Contact: <Text style={styles.value}>{incident.contactNumber}</Text></Text>
+      <Text style={styles.label}>Reporter: <Text style={styles.value}>{incident.assignedTo}</Text></Text>
+      <Text style={styles.label}>Contact: <Text style={styles.value}>{incident.phoneNumber}</Text></Text>
       <Text style={styles.label}>Status: <Text style={styles.value}>{incident.status}</Text></Text>
       <Text style={styles.label}>Timestamp: <Text style={styles.value}>{incident.timestamp}</Text></Text>
+
+      {/* Display the photo URL if available */}
+      {incident.photoUrl ? (
+        <Image source={{ uri: incident.photoUrl }} style={styles.image} />
+      ) : (
+        <Text>No image available</Text>
+      )}
 
       <MapView
         style={styles.map}
@@ -95,7 +108,7 @@ const IncidentDetail = () => {
       </MapView>
 
       <Button title="Go Back" onPress={() => router.back()} />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -105,6 +118,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, fontWeight: 'bold', marginVertical: 4 },
   value: { fontWeight: 'normal' },
   map: { width: '100%', height: 400, marginVertical: 16 },
+  image: { width: '100%', height: 200, resizeMode: 'cover', marginVertical: 16 },
 });
 
 export default IncidentDetail;

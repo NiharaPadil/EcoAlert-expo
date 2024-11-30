@@ -33,6 +33,18 @@ interface SOSAlert {
   latitude: number;
   longitude: number;
 }
+interface IncidentReport {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  timestamp: string;
+  location: { latitude: number; longitude: number };
+  phoneNumber: string;
+  assignedTo: string;
+  photoUrl: string;
+}
+
 
 export default function HomePage() {
   const router = useRouter();
@@ -40,6 +52,11 @@ export default function HomePage() {
   const [sosAlerts, setSosAlerts] = useState<SOSAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+
+  
+  const [reports, setReports] = useState<IncidentReport[]>([]);
+
+ 
 
   const handleSend = async () => {
     if (message.trim() === '') {
@@ -65,6 +82,12 @@ export default function HomePage() {
     router.push(`./2_SOSDetail?id=${alert.id}`);
   };
 
+  const handleReports= (report: IncidentReport) => {
+    router.push(`./3_IncidentDetail?id=${report.id}`);
+  };
+
+  
+
   const handleBlogPage = () => {
     //router.push('./4_Blogs');
   };
@@ -79,34 +102,74 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'SOS'), (snapshot) => {
-      const fetchedAlerts = snapshot.docs.map((doc) => {
+  
+
+// Fetch SOS Alerts and Reports data
+useEffect(() => {
+  // Fetch SOS Alerts
+  const unsubscribeSOS = onSnapshot(collection(db, 'SOS'), (snapshot) => {
+    const fetchedAlerts = snapshot.docs.map((doc) => {
+      const docData = doc.data() as DocumentData;
+      const timestamp = docData.timestamp;
+      const formattedTimestamp = timestamp
+        ? moment(new Date(timestamp.seconds * 1000)).format(
+            'MMM D, YYYY h:mm A'
+          )
+        : 'Unknown Time';
+      return {
+        id: doc.id,
+        name: docData.Name,
+        phonenumber: docData.phonenumber,
+        status: docData.status,
+        timestamp: formattedTimestamp,
+        type: docData.type,
+        latitude: docData.location?.latitude || 0,
+        longitude: docData.location?.longitude || 0,
+      } as SOSAlert;
+    });
+    setSosAlerts(fetchedAlerts);
+    setLoading(false);
+  });
+
+  // Fetch Reports
+  const unsubscribeReports = onSnapshot(
+    collection(db, 'IncidentReports'), // Firestore collection
+    (snapshot) => {
+      const fetchedReports = snapshot.docs.map((doc) => {
         const docData = doc.data() as DocumentData;
-        const timestamp = docData.timestamp;
+        
+        // Handling the timestamp (converting Firestore time to a readable format)
+        const timestamp = docData.Time;
         const formattedTimestamp = timestamp
-          ? moment(new Date(timestamp.seconds * 1000)).format(
-              'MMM D, YYYY h:mm A'
-            )
+          ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
           : 'Unknown Time';
+        
         return {
           id: doc.id,
-          name: docData.Name,
-          phonenumber: docData.phonenumber,
-          status: docData.status,
+          title: docData.title || 'No Title',
+          description: docData.description || 'No Description',
+          status: docData.status || 'Unknown',
           timestamp: formattedTimestamp,
-          type: docData.type,
-          latitude: docData.location?.latitude || 0,
-          longitude: docData.location?.longitude || 0,
-        } as SOSAlert;
+          location: {
+            latitude: docData.location?.latitude || 0,
+            longitude: docData.location?.longitude || 0,
+          },
+          phoneNumber: docData.PhoneNumber || 'Unknown', // Mapped from Firestore field 'PhoneNumber'
+          assignedTo: docData.assigneto || 'Unassigned', // Mapped from Firestore field 'assigneto'
+          photoUrl: docData.photourl || '', // Mapped from Firestore field 'photourl'
+        } as IncidentReport;
       });
+      setReports(fetchedReports);
+    }
+  );
 
-      setSosAlerts(fetchedAlerts);
-      setLoading(false);
-    });
+  // Cleanup
+  return () => {
+    unsubscribeSOS();
+    unsubscribeReports();
+  };
+}, []);
 
-    return () => unsubscribe();
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -167,34 +230,44 @@ export default function HomePage() {
 
 
       {/* Reports Section */}
-      <Text style={styles.sectionTitle}>Reports </Text>
-            <ScrollView style={styles.scrollView}>
-        <View style={styles.section}>
-          
-          {loading ? (
-            <Text>Loading...</Text>
-          ) : (
-            sosAlerts.map((alert) => (
-              <TouchableOpacity
-                key={alert.id}
-                style={styles.card}
-                onPress={() => handleViewDetails(alert)}
-              >
-                <Text style={styles.cardTitle}>{alert.name}</Text>
-                <Text style={styles.cardContent}>
-                  Phone: {alert.phonenumber}
-                </Text>
-                <Text style={styles.cardContent}>
-                  Type: {alert.type}, Status: {alert.status}
-                </Text>
-                <Text style={styles.cardContent}>
-                  Timestamp: {alert.timestamp}
-                </Text>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-      </ScrollView>
+      {/* Reports Section */}
+<Text style={styles.sectionTitle}>Reports</Text>
+<ScrollView style={styles.scrollView}>
+  <View style={styles.section}>
+    {loading ? (
+      <Text>Loading...</Text>
+    ) : reports.length === 0 ? (
+      <Text>No Reports Available</Text>
+    ) : (
+      reports.map((report) => (
+        <TouchableOpacity
+          key={report.id}
+          style={styles.card}
+          onPress={() => handleReports(report)} // Handles navigation to details page
+        >
+          <Text style={styles.cardTitle}>{report.title}</Text>
+          <Text style={styles.cardContent}>
+            Phone: {report.phoneNumber}
+          </Text>
+          <Text style={styles.cardContent}>
+            Assigned To: {report.assignedTo}
+          </Text>
+          <Text style={styles.cardContent}>
+            Status: {report.status}
+          </Text>
+          <Text style={styles.cardContent}>
+            Timestamp: {report.timestamp}
+          </Text>
+
+          {/* Render the photo image if photoUrl exists */}
+          {report.photoUrl ? (
+            <Image source={{ uri: report.photoUrl }} style={styles.reportImage} />
+          ) : null}
+        </TouchableOpacity>
+      ))
+    )}
+  </View>
+</ScrollView>
 
 
       <TouchableOpacity style={[styles.button,{left:50,width:270}]} onPress={handleBlogPage}>
@@ -359,5 +432,13 @@ const styles = StyleSheet.create({
     width: 25, // Adjust width as needed
     height: 25, // Adjust height as needed
     marginRight: 10, // Space between icon and text
+  },
+  reportImage: {
+    width: 100,   // Set the width you need
+    height: 100,  // Set the height you need
+    marginTop: 10, // Optional: Add some margin space
+    borderRadius: 10, // Optional: Rounded corners for the image
+    resizeMode: 'cover', // Make sure the image fits well
+    marginBottom: 10, // Optional: Space below the image
   },
 });
