@@ -106,7 +106,7 @@ export default function HomePage() {
 
 // Fetch SOS Alerts and Reports data
 useEffect(() => {
-  // Fetch SOS Alerts
+  // Fetch SOS Alerts 
   const unsubscribeSOS = onSnapshot(collection(db, 'SOS'), (snapshot) => {
     const fetchedAlerts = snapshot.docs.map((doc) => {
       const docData = doc.data() as DocumentData;
@@ -131,7 +131,7 @@ useEffect(() => {
     setLoading(false);
   });
 
-  // Fetch Reports
+  // Fetch Reports with filtered
   const unsubscribeReports = onSnapshot(
     collection(db, 'IncidentReports'), // Firestore collection
     (snapshot) => {
@@ -159,7 +159,8 @@ useEffect(() => {
           photoUrl: docData.photourl || '', // Mapped from Firestore field 'photourl'
         } as IncidentReport;
       });
-      setReports(fetchedReports);
+      const filteredReports = fetchedReports.filter(report => report.status !== 'Handled');
+      setReports(filteredReports);
     }
   );
 
