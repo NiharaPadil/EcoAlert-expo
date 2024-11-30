@@ -89,7 +89,7 @@ export default function HomePage() {
   
 
   const handleBlogPage = () => {
-    //router.push('./4_Blogs');
+    router.push('./4_Blogsauth');
   };
 
   const handleSignOut = async () => {

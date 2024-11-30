@@ -82,7 +82,7 @@ useEffect(() => {
 
   const handleAlertsInYourArea = () => {
     router.push('./3_AlertsInArea');
-    Alert.alert("Alert", "This feature will show alerts from forest authorities if any wildlife is spotted outside the reserve.");
+    // Alert.alert("Alert", "This feature will show alerts from forest authorities if any wildlife is spotted outside the reserve.");
   };
 
   const handleBlogPage = () => {
@@ -442,3 +442,7 @@ const styles = StyleSheet.create({
   },
  
 });
+
+
+
+
