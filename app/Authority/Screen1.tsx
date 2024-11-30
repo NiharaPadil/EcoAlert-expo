@@ -128,7 +128,8 @@ useEffect(() => {
         longitude: docData.location?.longitude || 0,
       } as SOSAlert;
     });
-    setSosAlerts(fetchedAlerts);
+    const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
+    setSosAlerts(activeAlerts);
     setLoading(false);
   });
 
