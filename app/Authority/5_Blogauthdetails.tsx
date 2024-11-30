@@ -91,15 +91,14 @@ const BlogDetail = () => {
 
 
 
-
-        <TouchableOpacity onPress={() => router.push(`./6_EditBlog?id=${blog.id}`)} style={styles.editButton}>
-  <Text style={styles.title}>Edit</Text>
-</TouchableOpacity>
-
-
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-          <Text style={styles.buttonText}>Delete</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+  <TouchableOpacity onPress={() => router.push(`./6_EditBlog?id=${blog.id}`)} style={styles.editButton}>
+    <Text style={styles.title}>Edit</Text>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+    <Text style={styles.title}>Delete</Text>
+  </TouchableOpacity>
+</View>
 
         <TouchableOpacity onPress={() => router.back()} style={styles.goback}>
           <Text style={styles.title}>Go Back</Text>
@@ -118,6 +117,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: '100%',
   },
+  buttonContainer: {
+    flexDirection: 'row', // Arrange children in a row
+    justifyContent: 'space-between', // Add space between buttons
+    alignItems: 'center', // Align items vertically
+    marginTop: 20,}, // Add spacing from the content above
   image: {
     width: '100%',
     height: 200,
@@ -126,7 +130,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 8,
+    marginVertical: 1,
   },
   author: {
     fontSize: 16,
@@ -145,43 +149,43 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   goback: {
-    width: '70%',
-    backgroundColor: '#D1FFBD',
+    width: '80%',
     height: 50,
-    borderRadius: 50,
+    left: 40,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    borderColor: '#D1FFBD',
+    borderWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10,
-    top: 20,
-    marginTop: 40,
-    borderWidth: 1,
-    left: 55,
-    bottom: 10,
+    marginTop: 80,
   },
   editButton: {
-    width: '70%',
-    backgroundColor: '#4CAF50',
+    flex: 1, // Allow buttons to share equal space
+    marginLeft: 10, // Add spacing between the buttons
+    backgroundColor: 'white',
+    borderRadius: 25,
+    borderColor: '#32CD32',
+    borderWidth: 3,
     height: 50,
-    borderRadius: 50,
+    
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10,
-    left: 55,
   },
   deleteButton: {
-    width: '70%',
-    backgroundColor: '#F44336',
+    flex: 1, // Allow buttons to share equal space
+    marginLeft: 10, // Add spacing between the buttons
+    backgroundColor: 'white',
+    borderRadius: 25,
+    borderColor: '#32CD32',
+    borderWidth: 3,
     height: 50,
-    borderRadius: 50,
+    
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10,
-    left: 55,
+   
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-  },
+  
 });
 
 export default BlogDetail;

@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../../constants/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
+import { color } from 'react-native-elements/dist/helpers';
 
 interface SOSAlert {
   id: string;
@@ -199,6 +200,12 @@ useEffect(() => {
         </TouchableOpacity>
       </View>
 
+      {/* manage broadcast */}
+      <TouchableOpacity style={styles.managebroadButton}  onPress={() => router.push(`./7_ShowBroadcast`)}>
+      <Text style={[styles.logoutText, { color: '#bcbcbc' }]}>Manage Broadcast</Text>
+
+      </TouchableOpacity>
+
       {/* SOS Alerts Section */}
       <Text style={styles.sectionTitle}>SOS Alerts</Text>
       <ScrollView style={styles.scrollView}>
@@ -323,6 +330,19 @@ const styles = StyleSheet.create({
     width: 90,
     height: 40,
     top: -10,
+  },
+  managebroadButton:{
+    padding: -10,
+    borderRadius: 18,
+    borderBottomEndRadius: 18,
+    backgroundColor: '#FFFFFF', // White background
+    borderColor: '#bcbcbc',     // Green border color
+    borderWidth: 2,  
+    bottom: -40,
+    left: 240,
+    width: 200,
+    height: 25,
+    top: -30,
   },
   logoutText: {
     color: 'green',
