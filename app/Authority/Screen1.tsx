@@ -23,6 +23,7 @@ import { auth } from '../../constants/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { color } from 'react-native-elements/dist/helpers';
+import { serverTimestamp } from 'firebase/firestore';
 
 interface SOSAlert {
   id: string;
@@ -64,11 +65,11 @@ export default function HomePage() {
       alert('Message cannot be empty!');
       return;
     }
-
+  
     try {
       const docRef = await addDoc(collection(db, 'Broadcast'), {
         message,
-        timestamp: new Date().toISOString(),
+        timestamp: serverTimestamp(), // Use Firebase server timestamp
       });
       console.log('Message sent with ID:', docRef.id);
       alert('Message Broadcasted Successfully!');
