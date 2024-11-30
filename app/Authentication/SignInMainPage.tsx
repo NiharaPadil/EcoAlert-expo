@@ -142,28 +142,30 @@ const SignInMainPage = () => {
       }
   
       let location = await Location.getCurrentPositionAsync({});
-      const user = auth.currentUser;
-  
-      if (user) {
-        await addDoc(collection(db, 'SOS'), {
-          name: 'Unknown User', // Replace with userInfo.Name if available
-          phonenumber: 'Not provided', // Replace with userInfo.PhoneNum if available
-          status: 'none',
-          timestamp: new Date(),
-          type,
-          location: {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          },
-          userid: user.uid,
-        });
+      await addDoc(collection(db, 'SOSwLOGIN'), {
+        status: 'none',
+        timestamp: new Date(),
+        type,
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+
+      });
+      
+
+      // Show success alert after sending SOS alert
+      Alert.alert(
+        'SOS Sent',
+        'SOS HAS BEEN SENT TO NEARBY AUTHORITIES. THEY WILL ARRIVE SOON.'
+      );
   
         Alert.alert(
           'SOS Sent',
           'SOS HAS BEEN SENT TO NEARBY AUTHORITIES. THEY WILL ARRIVE SOON.'
         );
       }
-    } catch (error) {
+    catch (error) {
       console.error('Error sending SOS alert: ', error);
     }
   };

@@ -46,6 +46,16 @@ interface IncidentReport {
   photoUrl: string;
 }
 
+interface SOSWAlert {
+  id: string;
+  name: string;
+  phonenumber: string;
+  status: string;
+  timestamp: string;
+  type: string;
+  latitude: number;
+  longitude: number;
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -53,7 +63,8 @@ export default function HomePage() {
   const [sosAlerts, setSosAlerts] = useState<SOSAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-
+  const [loadingSOSW, setLoadingSOSW] = useState(true);
+  const [soswAlerts, setSoswAlerts] = useState<SOSWAlert[]>([]);
   
   const [reports, setReports] = useState<IncidentReport[]>([]);
 
@@ -87,6 +98,9 @@ export default function HomePage() {
     router.push(`./3_IncidentDetail?id=${report.id}`);
   };
 
+  const handleSOSWDetails = (alert: SOSWAlert) => {
+    router.push(`./2_SOSWlogin?id=${alert.id}`);
+  };
   
 
   const handleBlogPage = () => {
@@ -107,6 +121,34 @@ export default function HomePage() {
 
 // Fetch SOS Alerts and Reports data
 useEffect(() => {
+  //sos w alerts
+  const unsubscribeSOSW = onSnapshot(collection(db, 'SOSwLOGIN'), (snapshot) => {
+    const fetchedAlerts = snapshot.docs.map((doc) => {
+      const docData = doc.data() as DocumentData;
+      const timestamp = docData.timestamp;
+      const formattedTimestamp = timestamp
+        ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
+        : 'Unknown Time';
+      return {
+        id: doc.id,
+        name: docData.Name,
+        phonenumber: docData.phonenumber,
+        status: docData.status,
+        timestamp: formattedTimestamp,
+        type: docData.type,
+        latitude: docData.location?.latitude || 0,
+        longitude: docData.location?.longitude || 0,
+      } as SOSWAlert;
+    });
+    
+    const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
+    
+    setSoswAlerts(activeAlerts);
+    setLoadingSOSW(false);  // Set loading state to false after SOSW alerts are loaded
+  });
+
+
+
   // Fetch SOS Alerts 
   const unsubscribeSOS = onSnapshot(collection(db, 'SOS'), (snapshot) => {
     const fetchedAlerts = snapshot.docs.map((doc) => {
@@ -170,9 +212,13 @@ useEffect(() => {
   return () => {
     unsubscribeSOS();
     unsubscribeReports();
+    unsubscribeSOSW();
   };
 }, []);
 
+const allAlerts = [...sosAlerts, ...soswAlerts].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+const isLoading = loading || loadingSOSW;
+//console.log("Combined Alerts:", allAlerts);
 
   return (
     <View style={styles.container}>
@@ -207,35 +253,30 @@ useEffect(() => {
 
       </TouchableOpacity>
 
+      
+
       {/* SOS Alerts Section */}
       <Text style={styles.sectionTitle}>SOS Alerts</Text>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.section}>
-          
-          {loading ? (
-            <Text>Loading...</Text>
-          ) : (
-            sosAlerts.map((alert) => (
-              <TouchableOpacity
-                key={alert.id}
-                style={styles.card}
-                onPress={() => handleViewDetails(alert)}
-              >
-                <Text style={styles.cardTitle}>{alert.name}</Text>
-                <Text style={styles.cardContent}>
-                  Phone: {alert.phonenumber}
-                </Text>
-                <Text style={styles.cardContent}>
-                  Type: {alert.type}, Status: {alert.status}
-                </Text>
-                <Text style={styles.cardContent}>
-                  Timestamp: {alert.timestamp}
-                </Text>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-      </ScrollView>
+     <ScrollView style={styles.scrollView}>
+  <View style={styles.section}>
+    {isLoading ? (
+      <Text>Loading...</Text>
+    ) : (
+      allAlerts.map((alert) => (
+        <TouchableOpacity
+          key={alert.id}
+          style={styles.card}
+          onPress={() => alert.type === 'SOS' ? handleViewDetails(alert) : handleSOSWDetails(alert)}
+        >
+          <Text style={styles.cardTitle}>{alert.name}</Text>
+          <Text style={styles.cardContent}>Phone: {alert.phonenumber}</Text>
+          <Text style={styles.cardContent}>Type: {alert.type}, Status: {alert.status}</Text>
+          <Text style={styles.cardContent}>Timestamp: {alert.timestamp}</Text>
+        </TouchableOpacity>
+      ))
+    )}
+  </View>
+</ScrollView>
 
 
       {/* Reports Section */}

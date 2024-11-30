@@ -184,18 +184,15 @@ const handleSosPressIn = () => {
 
       <Text style={styles.broadcastTitle}>Broadcast Notifications</Text>
 <ScrollView style={styles.scrollContainer}>
-{broadcastMessage && Array.isArray(broadcastMessage) && broadcastMessage.length > 0 ? (
-  broadcastMessage.map((message : any) => (
-    <View key={message.id} style={styles.notificationCard}>
-      <Text style={styles.messageText}>{message.message}</Text>
-    </View>
-  ))
-) : (
-  <View style={styles.noMessagesContainer}>
-    <Text style={styles.noMessagesText}>No messages to display</Text>
-  </View>
-)}
-
+  {broadcastMessage && Array.isArray(broadcastMessage) && broadcastMessage.length > 0 ? (
+    broadcastMessage.map((message: any) => (
+      <View key={message.id} style={styles.notificationCard}>
+        <Text style={styles.messageText}>{message.message}</Text>
+      </View>
+    ))
+  ) : (
+    <Text>No notifications available</Text>
+  )}
 </ScrollView>
 
 
@@ -369,27 +366,29 @@ const styles = StyleSheet.create({
   
   notificationCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 80,
-    maxHeight: 30,
-    padding: 0,
+    borderRadius: 8,
+    padding: 15,
     marginBottom: 10,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },
-    height: 80,
     width: 350,
+     // Allows the card to expand as content inside grows
+    maxHeight: 400, // Set a max height for the box
+    overflow: 'hidden', // Ensures nothing overflows the container's edges
   },
+  
+  
   messageText: {
-    fontSize: 16,
+    fontSize: 18,  // Increase font size for better readability
     color: 'black',
     textAlign: 'center',
-   // alignContent: 'center',
     justifyContent: 'center',
     marginTop: 5,
-   
   },
+  
  
   noMessagesText: {
     fontSize: 16,
@@ -398,7 +397,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   noMessagesContainer: {
-    height: 50, // Smaller height
+    height: '100%', // Smaller height
     width: '100%', // Consistent width
     backgroundColor: '#f9f9f9', // Subtle background color
     borderRadius: 8,
@@ -413,7 +412,7 @@ const styles = StyleSheet.create({
   
 
   },scrollContainer: {
-    maxHeight: 200, // Limits height of the scrollable area
+    maxHeight: 400, // Limits height of the scrollable area
     width: '80%',
     //height: '50%',
     backgroundColor: '#ffffff',
