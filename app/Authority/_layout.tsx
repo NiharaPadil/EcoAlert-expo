@@ -31,6 +31,7 @@ export default function RootLayout() {
       <Stack>
       <Stack.Screen name="Screen1" options={{ headerShown: false }} />
       <Stack.Screen name="2_SOSDetail" options={{ headerShown: false }} />
+      <Stack.Screen name="3_IncidentDetail" options={{ headerShown: false }} />
       <Stack.Screen name="4_Blogsauth" options={{ headerShown: false }} />
       <Stack.Screen name="5_Blogauthdetails" options={{ headerShown: false }} />
       <Stack.Screen name="6_EditBlog" options={{ headerShown: false }} />
