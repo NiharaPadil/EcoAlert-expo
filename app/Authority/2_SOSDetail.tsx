@@ -1,7 +1,3 @@
-
-
-
-//with alert messages handling
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -23,9 +19,11 @@ interface SOS {
   userid: string;
 }
 
+
 const SOSDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Get SOS id from route parameters
+  console.log(id);
   const [sos, setSOS] = useState<SOS | null>(null);
   const [loading, setLoading] = useState(true); // Loading state
   const [authorityLocation, setAuthorityLocation] = useState<{ latitude: number; longitude: number } | null>(null); // State for authority location
@@ -33,29 +31,36 @@ const SOSDetail = () => {
   useEffect(() => {
     const fetchSOS = async () => {
       if (!id) return; // Ensure id is present before fetching
-      const docRef = doc(db, 'SOS', id as string);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const docData = docSnap.data();
-        const formattedTimestamp = docData.timestamp
-          ? moment(new Date(docData.timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
-          : 'Unknown Time';
+      try {
+        const docRef = doc(db, 'SOS', id as string);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const docData = docSnap.data();
+          const formattedTimestamp = docData.timestamp
+            ? moment(new Date(docData.timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
+            : 'Unknown Time';
 
-        setSOS({
-          id: docSnap.id,
-          latitude: docData.location.latitude,
-          longitude: docData.location.longitude,
-          name: docData.name,
-          phonenumber: docData.phonenumber,
-          status: docData.status,
-          timestamp: formattedTimestamp,
-          type: docData.type,
-          userid: docData.userid,
-        });
-      } else {
-        console.log('No such SOS document!');
+          setSOS({
+            id: docSnap.id,
+            latitude: docData.location.latitude,
+            longitude: docData.location.longitude,
+            name: docData.name,
+            phonenumber: docData.phonenumber,
+            status: docData.status||'Pending',
+            timestamp: formattedTimestamp,
+            type: docData.type,
+            userid: docData.userid,
+          });
+        } else {
+          console.log('No such SOS document!');
+          Alert.alert('Error', 'SOS Request not found!');
+        }
+      } catch (error) {
+        console.error('Error fetching SOS:', error);
+        Alert.alert('Error', 'Failed to fetch SOS request!');
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
-      setLoading(false); // Set loading to false after fetching
     };
 
     fetchSOS();
@@ -99,18 +104,23 @@ const SOSDetail = () => {
   const handleStatusUpdate = async () => {
     if (!sos) return;
 
-    const docRef = doc(db, 'SOS', sos.id);
-    await updateDoc(docRef, { status: 'Handled' }); // Update the status to 'Handled'
+    try { 
+      const docRef = doc(db, 'SOS', sos.id);
+      await updateDoc(docRef, { status: 'Handled' }); // Update the status to 'Handled'
 
-    // Update the local state to reflect the change
-    setSOS((prevSOS) => prevSOS ? { ...prevSOS, status: 'Handled' } : null);
+      // Update the local state to reflect the change
+      setSOS((prevSOS) => prevSOS ? { ...prevSOS, status: 'Handled' } : null);
 
-    // Show the success alert after the status is updated
-    Alert.alert(
-      'Status Updated', // Alert title
-      'The SOS request status has been updated to "Handled".', // Alert message
-      [{ text: 'OK' }] // Button to close the alert
-    );
+      // Show the success alert after the status is updated
+      Alert.alert(
+        'Status Updated', // Alert title
+        'The SOS request status has been updated to "Handled".', // Alert message
+        [{ text: 'OK' }] // Button to close the alert
+      );
+    } catch (error) {
+      console.error('Error updating status:', error);
+      Alert.alert('Error', 'Failed to update the SOS request status!');
+    }
   };
 
   return (
@@ -140,7 +150,7 @@ const SOSDetail = () => {
           title="SOS Location"
           description="This is the location of the SOS request."
         />
-        
+
         {/* Authority Location Marker */}
         {authorityLocation && (
           <Marker 
@@ -152,12 +162,12 @@ const SOSDetail = () => {
       </MapView>
 
       {/* Button to update the status to "Handled" */}
-      <Button title="Mark as Handled" onPress={handleStatusUpdate} color="#4CAF50"/>
-      
+      <Button title="Mark as Handled" onPress={handleStatusUpdate } color="#4CAF50" />
+
       {/* Spacer for some distance between buttons */}
       <View style={styles.buttonSpacer} />
 
-      <Button title="Go Back" onPress={() => router.back()} color="#4CAF50"/>
+      <Button title="Go Back" onPress={() => router.back()} color="#4CAF50" />
     </View>
   );
 };

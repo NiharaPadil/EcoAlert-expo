@@ -37,7 +37,7 @@ interface SOSAlert {
 }
 interface IncidentReport {
   id: string;
-  title: string;
+  // title: string;
   description: string;
   status: string;
   timestamp: string;
@@ -134,7 +134,7 @@ useEffect(() => {
         id: doc.id,
         name: docData.Name,
         phonenumber: docData.phonenumber,
-        status: docData.status,
+        status: docData.status||'Pending',
         timestamp: formattedTimestamp,
         type: docData.type,
         latitude: docData.location?.latitude || 0,
@@ -164,13 +164,14 @@ useEffect(() => {
         id: doc.id,
         name: docData.Name,
         phonenumber: docData.phonenumber,
-        status: docData.status,
+        status: docData.status||'Pending',
         timestamp: formattedTimestamp,
         type: docData.type,
         latitude: docData.location?.latitude || 0,
         longitude: docData.location?.longitude || 0,
       } as SOSAlert;
     });
+   
     const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
     setSosAlerts(activeAlerts);
     setLoading(false);
@@ -191,9 +192,9 @@ useEffect(() => {
         
         return {
           id: doc.id,
-          title: docData.title || 'No Title',
+          // title: docData.title || 'No Title',
           description: docData.description || 'No Description',
-          status: docData.status || 'Unknown',
+          status: docData.status || 'Pending',
           timestamp: formattedTimestamp,
           location: {
             latitude: docData.location?.latitude || 0,
@@ -217,7 +218,7 @@ useEffect(() => {
   };
 }, []);
 
-const allAlerts = [...sosAlerts, ...soswAlerts].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+// const allAlerts = [...sosAlerts, ...soswAlerts].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 const isLoading = loading || loadingSOSW;
 //console.log("Combined Alerts:", allAlerts);
 
@@ -258,26 +259,49 @@ const isLoading = loading || loadingSOSW;
 
       {/* SOS Alerts Section */}
       <Text style={styles.sectionTitle}>SOS Alerts</Text>
-     <ScrollView style={styles.scrollView}>
-  <View style={styles.section}>
-    {isLoading ? (
-      <Text>Loading...</Text>
-    ) : (
-      allAlerts.map((alert) => (
-        <TouchableOpacity
-          key={alert.id}
-          style={styles.card}
-          onPress={() => alert.type === 'SOS' ? handleViewDetails(alert) : handleSOSWDetails(alert)}
-        >
-          <Text style={styles.cardTitle}>{alert.name}</Text>
-          <Text style={styles.cardContent}>Phone: {alert.phonenumber}</Text>
-          <Text style={styles.cardContent}>Type: {alert.type}, Status: {alert.status}</Text>
-          <Text style={styles.cardContent}>Timestamp: {alert.timestamp}</Text>
-        </TouchableOpacity>
-      ))
-    )}
-  </View>
-</ScrollView>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.section}>
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : (
+            sosAlerts.map((alert) => (
+              <TouchableOpacity
+                key={alert.id}
+                style={styles.card}
+                onPress={() => handleViewDetails(alert)}
+              >
+                <Text style={styles.cardTitle}>{alert.name}</Text>
+                <Text style={styles.cardContent}>Phone: {alert.phonenumber}</Text>
+                <Text style={styles.cardContent}>Type: {alert.type}, Status: {alert.status}</Text>
+                <Text style={styles.cardContent}>Timestamp: {alert.timestamp}</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+      </ScrollView>
+
+      {/* SOSW Alerts Section */}
+      <Text style={styles.sectionTitle}>SOSW Alerts</Text>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.section}>
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : (
+            soswAlerts.map((alert) => (
+              <TouchableOpacity
+                key={alert.id}
+                style={styles.card}
+                onPress={() => handleSOSWDetails(alert)}
+              >
+                <Text style={styles.cardTitle}>{alert.name}</Text>
+                <Text style={styles.cardContent}>Phone: {alert.phonenumber}</Text>
+                <Text style={styles.cardContent}>Type: {alert.type}, Status: {alert.status}</Text>
+                <Text style={styles.cardContent}>Timestamp: {alert.timestamp}</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+      </ScrollView>
 
 
       {/* Reports Section */}
@@ -296,7 +320,7 @@ const isLoading = loading || loadingSOSW;
           style={styles.card}
           onPress={() => handleReports(report)} // Handles navigation to details page
         >
-          <Text style={styles.cardTitle}>{report.title}</Text>
+          {/* <Text style={styles.cardTitle}>{report.title}</Text> */}
           <Text style={styles.cardContent}>
             Phone: {report.phoneNumber}
           </Text>
@@ -498,11 +522,12 @@ const styles = StyleSheet.create({
     marginRight: 10, // Space between icon and text
   },
   reportImage: {
-    width: 100,   // Set the width you need
-    height: 100,  // Set the height you need
-    marginTop: 10, // Optional: Add some margin space
-    borderRadius: 10, // Optional: Rounded corners for the image
-    resizeMode: 'cover', // Make sure the image fits well
-    marginBottom: 10, // Optional: Space below the image
+    width: 100,   
+    height: 100,  
+    marginTop: 10, 
+    borderRadius: 10, 
+    resizeMode: 'cover', 
+    marginBottom: 10, 
   },
 });
+ 

@@ -36,6 +36,8 @@ export default function RootLayout() {
       <Stack.Screen name="5_Blogauthdetails" options={{ headerShown: false }} />
       <Stack.Screen name="6_EditBlog" options={{ headerShown: false }} />
       <Stack.Screen name="7_ShowBroadcast" options={{ headerShown: false }} />
+      <Stack.Screen name="2_SOSWlogin" options={{ headerShown: false }} />
+
       
    </Stack>
     </ThemeProvider>

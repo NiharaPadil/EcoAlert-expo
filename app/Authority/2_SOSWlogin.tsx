@@ -224,11 +224,11 @@ const SOSDetail = () => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const docData = docSnap.data();
-
-          const timestamp = docData.Time;
+          const timestamp = docData.timestamp;
           const formattedTimestamp = timestamp
             ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
-            : 'Unknown Time';
+            : 'Unknown Time';  
+  
 
           setSOS({
             id: docSnap.id,
@@ -338,10 +338,9 @@ const SOSDetail = () => {
           />
         )}
       </MapView>
-
-      <Button title="Mark as Handled" onPress={handleStatusUpdate} />
+      <Button title="Mark as Handled" onPress={handleStatusUpdate} color="#4CAF50" />
       <View style={styles.buttonSpacer} />
-      <Button title="Go Back" onPress={() => router.back()} />
+      <Button title="Go Back" onPress={() => router.back()} color="#4CAF50"/>
     </View>
   );
 };

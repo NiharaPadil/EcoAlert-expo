@@ -14,7 +14,7 @@ import MapView, { Marker } from 'react-native-maps';
 
 interface IncidentReport {
   id: string;
-  title: string;
+  // title: string;
   description: string;
   status: string;
   timestamp: string;
@@ -45,7 +45,7 @@ const IncidentDetail = () => {
 
         setIncident({
           id: docSnap.id,
-          title: docData.title || 'No Title',
+          // title: docData.title || 'No Title',
           description: docData.description || 'No Description',
           status: docData.status || 'Unknown',
           timestamp: formattedTimestamp,
@@ -95,7 +95,8 @@ const IncidentDetail = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.title}>{incident.title}</Text>
+      <Text style={styles.title}>Report Incidnet Details</Text>
+      {/* <Text style={styles.title}>{incident.title}</Text> */}
       <Text style={styles.label}>Description: <Text style={styles.value}>{incident.description}</Text></Text>
       <Text style={styles.label}>Reporter: <Text style={styles.value}>{incident.assignedTo}</Text></Text>
       <Text style={styles.label}>Contact: <Text style={styles.value}>{incident.phoneNumber}</Text></Text>
