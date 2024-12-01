@@ -146,9 +146,9 @@ const handleSosPressIn = () => {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      const user = auth.currentUser;
+      // const user = auth.currentUser;
       
-      if (user) {
+      // if (user) {
         await addDoc(collection(db, 'SOS'), {
           name: userInfo.Name || 'Unknown User',
           phonenumber: userInfo.PhoneNum || 'Not provided',
@@ -159,7 +159,7 @@ const handleSosPressIn = () => {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           },
-          userid: user.uid,
+          // userid: user.uid,
         });
 
         Alert.alert(
@@ -167,7 +167,8 @@ const handleSosPressIn = () => {
           'SOS HAS BEEN SENT TO NEARBY AUTHORITIES. THEY WILL ARRIVE SOON.'
         );
       }
-    } catch (error) {
+    //} 
+    catch (error) {
       console.error('Error sending SOS alert: ', error);
     }
   };

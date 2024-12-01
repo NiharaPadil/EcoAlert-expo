@@ -389,7 +389,9 @@ const RegisterPage = () => {
 
         
         // Save the SOS alert to Firestore
-        await addDoc(collection(db, 'SOSwLOGIN'), {
+        await addDoc(collection(db, 'SOS'), {
+          name: 'Unknown User',
+          phonenumber:'Not provided',
           status: 'none',
           timestamp: new Date(),
           type,
@@ -397,7 +399,7 @@ const RegisterPage = () => {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           },
-  
+          // userid: user.uid,
         });
         
   

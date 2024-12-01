@@ -99,9 +99,6 @@ export default function HomePage() {
     router.push(`./3_IncidentDetail?id=${report.id}`);
   };
 
-  const handleSOSWDetails = (alert: SOSWAlert) => {
-    router.push(`./2_SOSWlogin?id=${alert.id}`);
-  };
   
 
   const handleBlogPage = () => {
@@ -123,30 +120,30 @@ export default function HomePage() {
 // Fetch SOS Alerts and Reports data
 useEffect(() => {
   //sos w alerts
-  const unsubscribeSOSW = onSnapshot(collection(db, 'SOSwLOGIN'), (snapshot) => {
-    const fetchedAlerts = snapshot.docs.map((doc) => {
-      const docData = doc.data() as DocumentData;
-      const timestamp = docData.timestamp;
-      const formattedTimestamp = timestamp
-        ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
-        : 'Unknown Time';
-      return {
-        id: doc.id,
-        name: docData.Name,
-        phonenumber: docData.phonenumber,
-        status: docData.status||'Pending',
-        timestamp: formattedTimestamp,
-        type: docData.type,
-        latitude: docData.location?.latitude || 0,
-        longitude: docData.location?.longitude || 0,
-      } as SOSWAlert;
-    });
+  // const unsubscribeSOSW = onSnapshot(collection(db, 'SOSwLOGIN'), (snapshot) => {
+  //   const fetchedAlerts = snapshot.docs.map((doc) => {
+  //     const docData = doc.data() as DocumentData;
+  //     const timestamp = docData.timestamp;
+  //     const formattedTimestamp = timestamp
+  //       ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
+  //       : 'Unknown Time';
+  //     return {
+  //       id: doc.id,
+  //       name: docData.Name,
+  //       phonenumber: docData.phonenumber,
+  //       status: docData.status||'Pending',
+  //       timestamp: formattedTimestamp,
+  //       type: docData.type,
+  //       latitude: docData.location?.latitude || 0,
+  //       longitude: docData.location?.longitude || 0,
+  //     } as SOSWAlert;
+  //   });
     
-    const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
+  //   const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
     
-    setSoswAlerts(activeAlerts);
-    setLoadingSOSW(false);  // Set loading state to false after SOSW alerts are loaded
-  });
+  //   setSoswAlerts(activeAlerts);
+  //   setLoadingSOSW(false);  // Set loading state to false after SOSW alerts are loaded
+  // });
 
 
 
@@ -214,12 +211,14 @@ useEffect(() => {
   return () => {
     unsubscribeSOS();
     unsubscribeReports();
-    unsubscribeSOSW();
+    // unsubscribeSOSW();
   };
 }, []);
-
-// const allAlerts = [...sosAlerts, ...soswAlerts].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-const isLoading = loading || loadingSOSW;
+// const combinedAlerts = [
+//   ...sosAlerts.map((alert) => ({ ...alert, type: 'SOS' })),
+//   ...soswAlerts.map((alert) => ({ ...alert, type: 'SOSW' })),
+// ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+const isLoading = loading
 //console.log("Combined Alerts:", allAlerts);
 
   return (
@@ -281,7 +280,7 @@ const isLoading = loading || loadingSOSW;
       </ScrollView>
 
       {/* SOSW Alerts Section */}
-      <Text style={styles.sectionTitle}>SOSW Alerts</Text>
+      {/* <Text style={styles.sectionTitle}>SOSW Alerts</Text>
       <ScrollView style={styles.scrollView}>
         <View style={styles.section}>
           {isLoading ? (
@@ -301,7 +300,7 @@ const isLoading = loading || loadingSOSW;
             ))
           )}
         </View>
-      </ScrollView>
+      </ScrollView> */}
 
 
       {/* Reports Section */}

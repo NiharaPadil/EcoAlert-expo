@@ -142,7 +142,9 @@ const SignInMainPage = () => {
       }
   
       let location = await Location.getCurrentPositionAsync({});
-      await addDoc(collection(db, 'SOSwLOGIN'), {
+      await addDoc(collection(db, 'SOS'), {
+        name: 'Unknown User',
+        phonenumber:'Not provided',
         status: 'none',
         timestamp: new Date(),
         type,
@@ -150,7 +152,7 @@ const SignInMainPage = () => {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         },
-
+        // userid: user.uid,
       });
       
 

@@ -16,7 +16,7 @@ interface SOS {
   status: string;
   timestamp: string;
   type: string;
-  userid: string;
+  // userid: string;
 }
 
 
@@ -46,10 +46,10 @@ const SOSDetail = () => {
             longitude: docData.location.longitude,
             name: docData.name,
             phonenumber: docData.phonenumber,
-            status: docData.status||'Pending',
+            status:docData.status,
             timestamp: formattedTimestamp,
             type: docData.type,
-            userid: docData.userid,
+            // userid: docData.userid,
           });
         } else {
           console.log('No such SOS document!');
@@ -131,7 +131,7 @@ const SOSDetail = () => {
       <Text style={styles.label}>Status: <Text style={styles.value}>{sos.status}</Text></Text>
       <Text style={styles.label}>Location: <Text style={styles.value}>Lat: {sos.latitude}, Lon: {sos.longitude}</Text></Text>
       <Text style={styles.label}>Type: <Text style={styles.value}>{sos.type}</Text></Text>
-      <Text style={styles.label}>User ID: <Text style={styles.value}>{sos.userid}</Text></Text>
+      {/* <Text style={styles.label}>User ID: <Text style={styles.value}>{sos.userid}</Text></Text> */}
       <Text style={styles.label}>Timestamp: <Text style={styles.value}>{sos.timestamp}</Text></Text>
 
       {/* Map View */}
