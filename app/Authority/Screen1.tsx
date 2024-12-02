@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useRef} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   TextInput,
+  Vibration,
 } from 'react-native';
 import {
   getFirestore,
@@ -58,6 +59,16 @@ interface SOSWAlert {
   longitude: number;
 }
 
+
+interface CapturedImage {
+  id: string;
+  location: { latitude: number; longitude: number };
+  timestamp: string;
+  photoUrl: string; 
+  status: string; // Add status field
+}
+
+
 export default function HomePage() {
   const router = useRouter();
   const db = getFirestore();
@@ -66,6 +77,7 @@ export default function HomePage() {
   const [message, setMessage] = useState('');
   const [loadingSOSW, setLoadingSOSW] = useState(true);
   const [soswAlerts, setSoswAlerts] = useState<SOSWAlert[]>([]);
+  const [capturedImages, setCapturedImages] = useState<CapturedImage[]>([]);
   
   const [reports, setReports] = useState<IncidentReport[]>([]);
 
@@ -91,6 +103,14 @@ export default function HomePage() {
     }
   };
 
+  const triggerVibration = () => {
+    Vibration.vibrate(500); // Vibrate for 500ms
+  };
+
+  const prevSOSAlertsRef = useRef<SOSAlert[]>([]);
+  const prevCapturedImagesRef = useRef<CapturedImage[]>([]);
+  const prevReportsRef = useRef<IncidentReport[]>([]);
+
   const handleViewDetails = (alert: SOSAlert) => {
     router.push(`./2_SOSDetail?id=${alert.id}`);
   };
@@ -99,7 +119,9 @@ export default function HomePage() {
     router.push(`./3_IncidentDetail?id=${report.id}`);
   };
 
-  
+  const handleCapturedImageDetail = (image: CapturedImage) => {
+    router.push(`./8_CapturedDetail?id=${image.id}`);
+  };
 
   const handleBlogPage = () => {
     router.push('./4_Blogsauth');
@@ -168,11 +190,57 @@ useEffect(() => {
         longitude: docData.location?.longitude || 0,
       } as SOSAlert;
     });
+
+
+    if (fetchedAlerts.length > prevSOSAlertsRef.current.length) {
+      triggerVibration(); // Trigger vibration when new data is added
+    }
    
     const activeAlerts = fetchedAlerts.filter(alert => alert.status !== 'Handled');
     setSosAlerts(activeAlerts);
+    prevSOSAlertsRef.current = fetchedAlerts;
     setLoading(false);
+
+    
   });
+
+
+  //ftech captured images
+  const unsubscribeCapturedImages = onSnapshot(collection(db, 'CapturedImages'), (snapshot) => {
+    const fetchedImages = snapshot.docs.map((doc) => {
+      const docData = doc.data();
+      const timestamp = docData.Time;
+      const formattedTimestamp = timestamp
+        ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
+        : 'Unknown Time';
+  
+      return {
+        id: doc.id,
+        location: {
+          latitude: docData.location?.latitude || 0,
+          longitude: docData.location?.longitude || 0,
+        },
+        timestamp: formattedTimestamp,
+        photoUrl: docData.Photo || '',
+        status: docData.Status || 'Pending',
+      } as CapturedImage;
+    });
+  
+
+    if (fetchedImages.length > prevCapturedImagesRef.current.length) {
+      triggerVibration(); // Trigger vibration when new data is added
+    }
+  
+  
+    const activeImages = fetchedImages.filter(image => image.status !== 'Handled');
+   
+  
+    setCapturedImages(activeImages); // Update the state with filtered images
+
+    prevCapturedImagesRef.current = fetchedImages;
+    setLoading(false); 
+  });
+  
 
   // Fetch Reports with filtered
   const unsubscribeReports = onSnapshot(
@@ -182,11 +250,10 @@ useEffect(() => {
         const docData = doc.data() as DocumentData;
         
         // Handling the timestamp (converting Firestore time to a readable format)
-        const timestamp = docData.Time;
+        const timestamp = docData.timestamp;
         const formattedTimestamp = timestamp
           ? moment(new Date(timestamp.seconds * 1000)).format('MMM D, YYYY h:mm A')
           : 'Unknown Time';
-        
         return {
           id: doc.id,
           // title: docData.title || 'No Title',
@@ -197,13 +264,22 @@ useEffect(() => {
             latitude: docData.location?.latitude || 0,
             longitude: docData.location?.longitude || 0,
           },
-          phoneNumber: docData.PhoneNumber || 'Unknown', // Mapped from Firestore field 'PhoneNumber'
+          phoneNumber: docData.phonenumber || 'Unknown', // Mapped from Firestore field 'PhoneNumber'
           assignedTo: docData.assigneto || 'Unassigned', // Mapped from Firestore field 'assigneto'
           photoUrl: docData.photourl || '', // Mapped from Firestore field 'photourl'
         } as IncidentReport;
       });
+      if (fetchedReports.length > prevReportsRef.current.length) {
+        triggerVibration(); // Trigger vibration when new data is added
+      }
       const filteredReports = fetchedReports.filter(report => report.status !== 'Handled');
       setReports(filteredReports);
+      prevReportsRef.current = fetchedReports; 
+
+      setLoading(false);
+
+     
+
     }
   );
 
@@ -211,6 +287,7 @@ useEffect(() => {
   return () => {
     unsubscribeSOS();
     unsubscribeReports();
+    unsubscribeCapturedImages();
     // unsubscribeSOSW();
   };
 }, []);
@@ -254,7 +331,32 @@ const isLoading = loading
 
       </TouchableOpacity>
 
-      
+       {/* Captured Images Section */}
+       <Text style={styles.sectionTitle}>Forest Images</Text>
+<ScrollView style={styles.scrollView}>
+  <View style={styles.section}>
+    {isLoading ? (
+      <Text>Loading...</Text>
+    ) : capturedImages.length === 0 ? (
+      <Text>No Images Available</Text>
+    ) : (
+      capturedImages.map((image) => (
+        <TouchableOpacity
+          key={image.id}
+          style={styles.card}
+          onPress={() => handleCapturedImageDetail(image)}
+        >
+          <Text style={styles.cardContent}>Timestamp: {image.timestamp}</Text>
+
+          {/* Render the image if photoUrl exists */}
+          {image.photoUrl ? (
+            <Image source={{ uri: image.photoUrl }} style={styles.reportImage} />
+          ) : null}
+        </TouchableOpacity>
+      ))
+    )}
+  </View>
+</ScrollView>
 
       {/* SOS Alerts Section */}
       <Text style={styles.sectionTitle}>SOS Alerts</Text>
