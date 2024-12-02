@@ -18,7 +18,7 @@ const AlertsInArea = () => {
   interface Report {
     id: string;
     PhoneNumber: string;
-    Time: { seconds: number };
+    timestamp: { seconds: number }; // Adjusted to Firestore Timestamp
     assignedto?: string;
     description: string;
     location: { latitude: number; longitude: number };
@@ -37,7 +37,7 @@ const AlertsInArea = () => {
         return {
           id: doc.id,
           PhoneNumber: data.PhoneNumber,
-          Time: data.Time,
+          timestamp: data.timestamp, // Firestore timestamp
           assignedto: data.assignedto,
           description: data.description,
           location: data.location,
@@ -50,14 +50,16 @@ const AlertsInArea = () => {
     return unsubscribe; // Clean up listener on unmount
   }, []);
 
-
   const handleCardPress = (report: Report) => {
     setSelectedReport(report);
     setModalVisible(true);
   };
 
   const renderCard = ({ item }: { item: Report }) => {
-    const { PhoneNumber, Time, assignedto, description, location, photourl } = item;
+    const { PhoneNumber, timestamp, assignedto, description, location, photourl } = item;
+
+    // Safely access the timestamp and format it
+    const timeString = timestamp ? new Date(timestamp.seconds * 1000).toLocaleString() : "Time not available";
 
     return (
       <TouchableOpacity onPress={() => handleCardPress(item)}>
@@ -77,7 +79,7 @@ const AlertsInArea = () => {
               <Text style={styles.bold}>Location:</Text> {`Lat: ${location.latitude}, Lon: ${location.longitude}`}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.bold}>Time:</Text> {new Date(Time.seconds * 1000).toLocaleString()}
+              <Text style={styles.bold}>Time:</Text> {timeString}
             </Text>
           </View>
         </View>
@@ -132,7 +134,7 @@ const AlertsInArea = () => {
               </Text>
               <Text style={styles.modalText}>
                 <Text style={styles.bold}>Time:</Text>{" "}
-                {new Date(selectedReport.Time.seconds * 1000).toLocaleString()}
+                {new Date(selectedReport.timestamp.seconds * 1000).toLocaleString()}
               </Text>
               <TouchableOpacity
                 style={styles.closeButton}
@@ -156,7 +158,6 @@ const styles = StyleSheet.create({
     paddingTop: 90,
     paddingLeft: 20,
     paddingRight: 20,
-   
   },
   card: {
     flexDirection: "row",
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     bottom: 40,
     backgroundColor: "#fff",
     width: "100%",
-borderRadius: 28,
+    borderRadius: 28,
     padding: 20,
     alignItems: "center",
   },
@@ -219,10 +220,8 @@ borderRadius: 28,
   map: {
     width: Dimensions.get("window").width * 0.9,
     height: Dimensions.get("window").height * 0.6,
-    //borderRadius: 108,
     top: -90,
   },
 });
-
 
 export default AlertsInArea;
