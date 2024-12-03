@@ -36,7 +36,7 @@ const AlertsInArea = () => {
         const data = doc.data();
         return {
           id: doc.id,
-          PhoneNumber: data.PhoneNumber,
+          PhoneNumber: data.phonenumber,
           timestamp: data.timestamp, // Firestore timestamp
           assignedto: data.assignedto,
           description: data.description,

@@ -145,6 +145,7 @@ const IncidentDetail = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     padding: 16,
+    paddingTop: 42,
     backgroundColor: 'white',
     flexGrow: 1,
   },

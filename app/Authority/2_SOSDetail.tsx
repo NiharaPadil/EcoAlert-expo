@@ -176,6 +176,7 @@ const SOSDetail = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    paddingTop: 80,
     backgroundColor: 'white',
     height: '100%',
   },

@@ -9,7 +9,7 @@ const SplashScreen2 = () => {
     const router = useRouter();
 
     const Reg = () => {
-        router.push('/Authentication/RegisterPage'); // Navigate to the User Sign Up page
+        router.push('/Authentication/SignInMainPage'); // Navigate to the User Sign Up page
       };
 
       

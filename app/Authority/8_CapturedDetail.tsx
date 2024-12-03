@@ -208,7 +208,7 @@ const CapturedImageDetail = () => {
         setCapturedImage({
           id: docSnap.id,
           timestamp: formattedTimestamp,
-          photoUrl: docData.Photo || '', // Assuming 'Photo' is the field name for the photo URL
+          photoUrl: docData.image_url || '', // Assuming 'Photo' is the field name for the photo URL
           location: docData.Location || { latitude: 0, longitude: 0 }, // Assuming 'Location' is the field name for the location
           status: docData.Status || 'Pending', // Assuming 'Status' is the field name for the status
         });
@@ -294,7 +294,8 @@ const CapturedImageDetail = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    padding: 16,
+    padding: 36,
+    paddingTop: 76,
     backgroundColor: 'white',
     flexGrow: 1,
   },

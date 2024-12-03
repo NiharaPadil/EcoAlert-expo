@@ -12,6 +12,7 @@ export default function UploadScreen() {
   const [location, setLocation] = useState<GeoPoint | null>(null); // Store location as a GeoPoint or null
   const [userData, setUserData] = useState<any>(null); // State for user data
   const [errorMsg, setErrorMsg] = useState<string>(''); // Error message state
+  const [assignedTo, setAssignedTo] = useState<string>(''); // State for assigned user
 
   // Fetch user data when the component mounts
   const fetchUserData = async () => {
@@ -131,6 +132,7 @@ const handleSubmit = async () => {
       uid: userData.userId, // Updated field name
       username: userData.Name, // Updated field name
       phonenumber: userData.PhoneNum, // Updated field name
+      assignedto: "not assigned", // Assign to user if available
     };
 
     await setDoc(doc(db, 'IncidentReports', filename), incidentData);
