@@ -1,10 +1,11 @@
 // app/BlogDetail.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, ActivityIndicator, TouchableOpacity,ScrollView } from 'react-native';
 import { useRouter,useLocalSearchParams } from 'expo-router'; // Use useSearchParams
 import { db } from '../../constants/firebaseConfig'; // Ensure your db is correctly imported
 import { doc, getDoc } from 'firebase/firestore';
 import moment from 'moment'; // Make sure to import moment if you use it
+//import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 
 interface Blog {
   id: string;
@@ -66,7 +67,7 @@ const BlogDetail = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.card}>
       <Image source={{ uri: blog.image }} style={styles.image} />
       <Text style={styles.title}>{blog.title}</Text>
@@ -77,16 +78,17 @@ const BlogDetail = () => {
         <Text style={styles.title}>Go Back</Text>
       </TouchableOpacity>
     </View>
-    </View>
+    </ScrollView>
   );
 };
 
 // Define your styles
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 26,
     backgroundColor: 'white',
     height: '100%',
+    
   },
   image: {
     width: '100%',
@@ -122,8 +124,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
-    top: 20,
+    //top: 20,
     marginTop: 40,
+    marginBottom:80,
     borderWidth: 1,
     left:55,
     bottom:10
