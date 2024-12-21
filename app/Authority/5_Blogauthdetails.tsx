@@ -1,6 +1,6 @@
 // app/BlogDetail.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Button, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, ActivityIndicator, TouchableOpacity, Alert ,ScrollView} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router'; // Use useSearchParams
 import { db } from '../../constants/firebaseConfig'; // Ensure your db is correctly imported
 import { doc, getDoc, deleteDoc } from 'firebase/firestore';

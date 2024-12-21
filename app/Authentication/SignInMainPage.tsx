@@ -29,6 +29,7 @@ const SignInMainPage = () => {
 
   const RegisterPage = () => {
     router.push('/Authentication/RegisterPage'); // Navigate to RegisterPage
+    console.log('Routed to Register Page');
   };
 
   const handleLogin = async () => {
